@@ -1,0 +1,119 @@
+/* /contributors: code contributors, the compute-donor leaderboard and CREDITS.md. Only this page loads it. */
+@layer components {
+  .people {
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+  .people h1 {
+    margin-top: 1rem;
+    font-size: clamp(1.9rem, 1.2rem + 3vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .people-lede {
+    margin-top: 1.2rem;
+    max-width: 46rem;
+    color: var(--color-mist);
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  }
+  .people a:not(.btn) {
+    color: var(--color-frontier);
+  }
+  .people-sec {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    padding-top: clamp(2rem, 5vw, 3rem);
+  }
+  .people-sec > h2 {
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .people-sec > p,
+  .people-sec .muted {
+    margin-block: 0.6rem 1.25rem;
+    color: var(--color-mist);
+  }
+  .people-sec h3 {
+    margin-top: 1.75rem;
+    font-weight: 700;
+  }
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: 0.75rem;
+  }
+  .people .people-grid a {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.03);
+    padding: 0.75rem;
+    color: var(--color-soft);
+    transition: border-color 0.3s;
+  }
+  .people .people-grid a:hover {
+    border-color: rgb(102 227 110 / 0.45);
+  }
+  .people-grid img {
+    border-radius: 999px;
+  }
+  .people-grid b {
+    display: block;
+    font-weight: 600;
+  }
+  .people-grid small {
+    color: var(--color-mist);
+    font-size: 0.8rem;
+  }
+  .people-empty {
+    display: grid;
+    justify-items: start;
+    gap: 0.8rem;
+  }
+  .people-empty p {
+    color: var(--color-mist);
+  }
+  .people-islands {
+    margin-top: 0.75rem;
+    color: var(--color-mist);
+  }
+  .credits-body {
+    color: var(--color-mist);
+    line-height: 1.7;
+  }
+  .credits-body h2 {
+    margin-top: 2rem;
+    color: var(--color-soft);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .credits-body p,
+  .credits-body table {
+    margin-top: 0.9rem;
+  }
+  .credits-body strong,
+  .credits-body code {
+    color: var(--color-soft);
+  }
+  .credits-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .credits-body th,
+  .credits-body td {
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    padding: 0.5rem 0.7rem 0.5rem 0;
+    text-align: left;
+    vertical-align: top;
+  }
+  .credits-body th {
+    color: var(--color-soft);
+    font-weight: 600;
+  }
+}

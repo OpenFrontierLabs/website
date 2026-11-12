@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { isOperator } from "../worker/github";
 import { validateAnswers } from "../worker/questionnaire";
 import { readSession, sign, signSession, stateMatches } from "../worker/signing";
+import { DISCORD_URL, issueSearch, PATHS, pathsFor } from "../worker/starter";
 
 const SECRET = crypto.randomUUID();
 const OTHER = crypto.randomUUID();
@@ -105,5 +106,25 @@ describe("questionnaire validator", () => {
   test("None conflicts with counts; consent needs an email", () => {
     const { errors } = validateAnswers(form([["displayName", "Ada"], ["hw_none", "on"], ["hw_tpu", "1"], ["consent", "on"]]));
     expect(Object.keys(errors).sort()).toEqual(["consent", "hardware"]);
+  });
+});
+
+describe("starter issues after the questionnaire", () => {
+  test("answers map to their contributor paths, in a fixed order", () => {
+    expect(pathsFor(["code"]).map((p) => p.title)).toEqual(["Rust and P2P", "Web"]);
+    expect(pathsFor(["funding", "compute", "research"]).map((p) => p.title)).toEqual(["Compute donor", "ML training", "Funding"]);
+    expect(pathsFor(["data", "evals", "community"]).map((p) => p.title)).toEqual(["Data", "Evals", "Docs and community"]);
+    expect(pathsFor([])).toEqual(Object.values(PATHS));
+  });
+
+  test("issue links are live good-first-issue searches with the path's label, never issue numbers", () => {
+    const url = new URL(issueSearch("area/rust"));
+    expect(url.origin + url.pathname).toBe("https://github.com/OpenFrontierLabs/openfrontier/issues");
+    expect(url.searchParams.get("q")).toBe('is:issue is:open label:"good first issue" label:"area/rust"');
+    for (const p of Object.values(PATHS)) {
+      expect(p.href).not.toMatch(/\/issues\/\d/);
+      if (p.href.includes("/issues?")) expect(new URL(p.href).searchParams.get("q")).toMatch(/^is:issue is:open label:"good first issue" label:"(?:area|layer)\/[\w-]+"$/);
+    }
+    expect(DISCORD_URL).toBe("https://discord.gg/M4sD8T5M8D");
   });
 });
