@@ -1,0 +1,24 @@
+# Open Frontier Labs
+
+> A community lab building fully open models (data, code, recipes, checkpoints, logs and weights) on pooled, distributed community compute. Early stage: nothing has been trained yet, Run 0 is forming, and no weights have been released.
+
+Everything we build is public. Code and weights are planned under Apache-2.0. There is no token and no equity.
+
+## Site
+
+- [Home](https://openfrontier-labs.com/): what the project is, how it works, what runs today and the roadmap
+- [Manifesto](https://openfrontier-labs.com/manifesto): why we build in the open
+- [Network dashboard](https://openfrontier-labs.com/dashboard): contributors, GPUs, runs and models as they really are (mostly zero for now)
+- [Join](https://openfrontier-labs.com/join): sign up with GitHub for the waitlist
+
+## Code and docs
+
+- [openfrontier repository](https://github.com/OpenFrontierLabs/openfrontier): the `ofl` CLI, configs, manifests and the compute ledger schema
+- [Run 0](https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md): the first run, a dense model of about 1B parameters on one GPU node; scaffolded, not started
+- [Joining a node](https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/join-a-node.md): what works today and what is planned but not built
+- [Governance](https://github.com/OpenFrontierLabs/openfrontier/blob/main/GOVERNANCE.md) and [Credits](https://github.com/OpenFrontierLabs/openfrontier/blob/main/CREDITS.md)
+
+## Contact
+
+- Email: openfrontierlabs@gmail.com
+- X: [@openfrontlabs](https://x.com/openfrontlabs)

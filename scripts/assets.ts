@@ -44,6 +44,8 @@ const square = (buf: Buffer, size: number, pad = 0) =>
     .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } });
 const arcLogo = await sharp(await transparent("arc-logo-1024.png", 1024)).trim({ threshold: 6 }).toBuffer();
 await emit("arc-160", sharp(arcLogo).resize({ width: 160 }));
+// Dashboard sidebar mark: the hex at 2x its 48px display size.
+await emit("hex-96", square(trimmed.data, 96, 2));
 // Hero arc stays opaque (blended with mix-blend-mode: screen on the page): its black is not pure black.
 const arcBox = await sharp(src("arc-logo-1024.png")).trim({ background: "#000", threshold: 24 }).toBuffer({ resolveWithObject: true });
 const pad = 24;

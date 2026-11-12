@@ -2,6 +2,8 @@
 @source "./*.html";
 @source "./partials/*.html";
 @source "../worker/*.ts";
+/* Generated: it carries the built stylesheet itself, and scanning it would feed every build into the next. */
+@source not "../worker/assets.gen.ts";
 
 @theme {
   --color-frontier: #66e36e;
@@ -10,8 +12,8 @@
   --color-silver: #6b7177;
   --color-mist: #a1a8ad;
   --color-soft: #f5f7f6;
-  --font-display: "Michroma", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Michroma", "Michroma Fallback", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Registered so the card border light can rotate (keyframes "orbit"). */
@@ -27,6 +29,27 @@
   font-display: swap;
   font-weight: 100 900;
   src: url(/assets/inter.woff2) format("woff2-variations");
+}
+
+/* Fonts are not preloaded (they would compete with first paint), so text first renders in a local
+   fallback scaled to the web font's width and line metrics; the swap then moves nothing.
+   Values measured against Arial / Liberation Sans in Chrome (canvas measureText). */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 105.08%;
+  ascent-override: 92.31%;
+  descent-override: 22.84%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Michroma Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 143.34%;
+  ascent-override: 80.93%;
+  descent-override: 18.84%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -1714,24 +1737,24 @@
     color: var(--color-mist);
     font-weight: 600;
   }
-  .pill {
+  .status-pill {
     display: inline-block;
     border: 1px solid rgb(255 255 255 / 0.2);
     border-radius: 999px;
     padding: 0.05rem 0.6rem;
     font-size: 0.75rem;
   }
-  .pill-waitlisted {
+  .status-waitlisted {
     color: #f3d37a;
   }
-  .pill-invited {
+  .status-invited {
     color: #8ecbff;
   }
-  .pill-active {
+  .status-active {
     border-color: rgb(102 227 110 / 0.5);
     color: var(--color-frontier);
   }
-  .pill-rejected {
+  .status-rejected {
     color: #ff8a8a;
   }
 
