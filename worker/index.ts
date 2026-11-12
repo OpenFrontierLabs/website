@@ -154,8 +154,13 @@ async function operatorRoutes(c: Ctx, user: db.UserRow): Promise<Response> {
   return html(operator.detailPage(v, { ...target, status: to as db.Status }));
 }
 
-/** POSTs must come from our own pages (SameSite=Lax already blocks cross-site cookies; this is the second lock). */
-const sameOrigin = (req: Request, url: URL) => req.headers.get("origin") === url.origin;
+/** POSTs must come from our own pages (SameSite=Lax already blocks cross-site cookies; this is the second lock).
+ * Sec-Fetch-Site is checked first because Chrome sends `Origin: null` on form POSTs when the page's referrer policy is strict. */
+const sameOrigin = (req: Request, url: URL) => {
+  const site = req.headers.get("sec-fetch-site");
+  if (site) return site === "same-origin";
+  return req.headers.get("origin") === url.origin;
+};
 
 async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   const { pathname } = c.url;

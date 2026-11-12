@@ -20,7 +20,7 @@ export const SECURITY_HEADERS: Record<string, string> = {
   "content-security-policy": CSP,
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
-  "referrer-policy": "no-referrer",
+  "referrer-policy": "same-origin",
   "strict-transport-security": "max-age=31536000; includeSubDomains",
   "cache-control": "no-store",
 };
