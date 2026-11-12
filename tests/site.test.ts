@@ -9,8 +9,8 @@ const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
 const manifestoPage = read("manifesto.html");
 const all = `${index}\n${read("404.html")}\n${manifestoPage}`;
-// Workers html_handling serves /manifesto from manifesto.html.
-const served = (p: string) => p === "/" || existsSync(join(dist, p)) || existsSync(join(dist, `${p}.html`));
+// Workers html_handling serves /manifesto from manifesto.html; the Worker serves /join.
+const served = (p: string) => p === "/" || p === "/join" || existsSync(join(dist, p)) || existsSync(join(dist, `${p}.html`));
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
@@ -21,7 +21,7 @@ describe("dist", () => {
   });
 
   test("required sections exist", () => {
-    for (const id of ["top", "main", "mission", "how", "platform", "community", "research", "network", "join"]) {
+    for (const id of ["top", "main", "mission", "how", "stack", "platform", "community", "research", "network", "join"]) {
       expect(index).toContain(`id="${id}"`);
     }
   });

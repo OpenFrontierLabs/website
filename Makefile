@@ -1,4 +1,4 @@
-.PHONY: setup dev build check release assets
+.PHONY: setup dev build check release assets migrate
 setup:
 	bun install
 dev:
@@ -11,3 +11,5 @@ check:
 	bun run check
 release:
 	bun run release
+migrate:
+	bun run migrate

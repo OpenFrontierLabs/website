@@ -1,0 +1,132 @@
+openapi: 3.1.1
+info:
+  title: Open Frontier Labs website
+  version: 0.1.0
+  description: >-
+    Browser routes served by the Worker (server-rendered HTML forms, no JSON API). Session is a
+    signed HttpOnly cookie set by the GitHub OAuth callback; POSTs must carry this site's Origin.
+    Pages, not a programmatic API, so paths are unversioned (declared in api-schema-gate.json).
+servers:
+  - url: https://openfrontier-labs.com
+paths:
+  /:
+    get:
+      summary: Home page (static asset) with the live waitlist count
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /join:
+    get:
+      summary: Sign-up page with Continue with GitHub; signed in, the questionnaire or Overview
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /auth/github:
+    get:
+      summary: Starts GitHub OAuth with a signed state cookie
+      responses:
+        "302": { description: To github.com/login/oauth/authorize (the only off-site hop) }
+  /auth/github/callback:
+    get:
+      summary: GitHub OAuth callback; checks state, sets the session, renders the questionnaire or Overview
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /console:
+    get:
+      summary: Member Console: Overview (waitlist status and position)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /console/nodes:
+    get:
+      summary: Member Console: My Nodes (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /console/contributions:
+    get:
+      summary: Member Console: Contributions (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /console/runs:
+    get:
+      summary: Member Console: Runs (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /console/teams:
+    get:
+      summary: Member Console: Teams (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin:
+    get:
+      summary: Operator Console: Operations (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/training:
+    get:
+      summary: Operator Console: Training (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/network:
+    get:
+      summary: Operator Console: Network (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/security:
+    get:
+      summary: Operator Console: Security (planned)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/review:
+    get:
+      summary: Operator Console: Review Queue (search, filters, counts)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/review.csv:
+    get:
+      summary: Review Queue CSV export with the same filters
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/review/{id}:
+    get:
+      summary: Sign-up detail with status buttons
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /admin/audit:
+    get:
+      summary: Operator Console: Audit (status changes, who and when)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /join/questionnaire:
+    get:
+      summary: Questionnaire (first time)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+    post:
+      summary: Save questionnaire answers
+      requestBody: { content: { application/x-www-form-urlencoded: {} } }
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+        "422": { description: Validation errors, form re-rendered, content: { text/html: {} } }
+  /console/profile:
+    get:
+      summary: Member Console: Profile / Settings (answers and edit form)
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+    post:
+      summary: Save edited answers
+      requestBody: { content: { application/x-www-form-urlencoded: {} } }
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+        "422": { description: Validation errors, form re-rendered, content: { text/html: {} } }
+  /admin/review/{id}/status:
+    post:
+      summary: Change a sign-up's status (form field status: waitlisted, invited, active, rejected); audited
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /logout:
+    post:
+      summary: Clear the session
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
