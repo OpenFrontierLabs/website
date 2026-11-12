@@ -1,6 +1,6 @@
 # Open Frontier Labs website
 
-Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open infrastructure for collective frontier intelligence. Static HTML + Tailwind CSS v4 on Cloudflare Workers Static Assets, plus a small Worker (`worker/`) and a D1 database (`ofl-waitlist`, schema in `migrations/`) for GitHub sign-up, the waitlist questionnaire, the contributor workspace (`/console`) and the Operator Console (`/admin`).
+Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open infrastructure for collective frontier intelligence. Static HTML + Tailwind CSS v4 on Cloudflare Workers Static Assets, plus a small Worker (`worker/`) and a D1 database (`ofl-waitlist`, schema in `migrations/`) for GitHub sign-up, the waitlist questionnaire, the contributor workspace (`/console`) and the Operator Console (`/admin`). `/contributors` is built from GitHub at build time: commit authors, the compute ledger and `CREDITS.md`.
 
 ```
 make setup    # bun install
@@ -13,5 +13,7 @@ make release  # build, then D1 migrations + wrangler deploy with a broker-minted
 Secrets (`wrangler secret put`): `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`; `GITHUB_CLIENT_ID` goes in `[vars]`. Until both GitHub values exist, `/auth/github` answers 503. Local `.dev.vars` needs `SESSION_SECRET` and `APP_ORIGIN=http://localhost:<port>`. Operators are active admins of the OpenFrontierLabs org, or the logins in `ADMIN_GITHUB_LOGINS`.
 
 Brand tokens (`src/styles.css`): Frontier Green `#66E36E`, Compute Green `#1B7F46`, Graphite `#0B0E0D`, Silver Gray `#6B7177` (decor only; body text uses the lighter `#A1A8AD` for AA contrast), Soft White `#F5F7F6`. Font: Inter variable, self-hosted.
+
+Commits need a DCO sign-off (`git commit -s`).
 
 Licence: Apache-2.0.

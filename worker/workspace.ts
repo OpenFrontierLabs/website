@@ -4,9 +4,8 @@ import { ASSET } from "./assets.gen";
 import type { AuditRow, UserRow } from "./db";
 import { brandPicture, documentHtml, esc, type Viewer } from "./html";
 import { DOCS_URL } from "./program";
+import { DISCORD_URL } from "./starter";
 import type { Answers } from "./questionnaire";
-
-export const DISCORD_URL = "https://discord.gg/M4sD8T5M8D";
 
 /** Everything a workspace page can show: the person's own row and answers, plus where they stand. */
 export interface WorkspaceData {

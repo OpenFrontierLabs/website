@@ -890,6 +890,55 @@
     font-size: 0.85em;
   }
 
+  /* starter issues */
+  .ws-lead {
+    max-width: 52rem;
+    color: var(--color-mist);
+    font-size: 0.88rem;
+  }
+  .ws-paths {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+  .ws-paths a {
+    display: grid;
+    height: 100%;
+    align-content: start;
+    gap: 0.35rem;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: 0.8rem;
+    background: #040605;
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .ws-paths a:hover {
+    border-color: rgb(102 227 110 / 0.5);
+    box-shadow: 0 0 22px rgb(102 227 110 / 0.1);
+  }
+  .ws-paths b {
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+  .ws-paths span {
+    color: var(--color-mist);
+  }
+  .ws-paths small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.3rem;
+    color: var(--color-frontier);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .ws-paths small svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
   /* program stepper and readiness */
   .ws-phases {
     display: grid;

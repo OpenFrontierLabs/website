@@ -91,5 +91,55 @@
         "title": "Seed org profile, logo and community health files"
       }
     ]
-  }
+  },
+  "credits": "# Credits\n\nCredit here is permanent, public and tied to the repository history. There is no token and no equity.\n\n## What is recorded\n\nCompute contributions are recorded in a public, machine-readable **compute ledger**, one JSON file per run and period under [`ledger/`](ledger/), validated against [`ledger/schema.json`](ledger/schema.json) by `ofl check` and `ofl test`. For every node:\n\n| Field | Meaning |\n| --- | --- |\n| `github_handle` | who ran the node |\n| `gpu_hours` | GPU-hours the node was training in the period |\n| `tokens_processed` | training tokens the node processed |\n| `helpful_update_share` | fraction of the node's submitted updates that lowered the loss (0 to 1) |\n| `island` | optional: the donated cluster the node belongs to |\n\nDonated or pooled clusters are named as **islands** in the same file, with who donated them. Details, and how a ledger is produced, are in [ledger/README.md](ledger/README.md).\n\nModel cards list compute contributors and donors by GitHub handle. Every release names the merged-code contributors. Anyone with merged work on a release is an author on its paper, following the large named author lists of BigScience and EleutherAI.\n\n## Status\n\nNothing has been trained, so there are no contributions to credit yet and no real ledger file. The only file under `ledger/` that holds data is [`ledger/example.EXAMPLE.json`](ledger/example.EXAMPLE.json), which is fake and marked as such. It names no real person.\n\nReal credits are added here by pull request when a run produces them.\n\n## Compute donors\n\nNone yet.\n\n## Code contributors\n\nEveryone with merged work is listed by the repository's commit history. A curated list will be added when there is something to curate.\n",
+  "ledger": [
+    {
+      "data": {
+        "example": true,
+        "islands": [
+          {
+            "donor": "Example Donor (not a real donor)",
+            "id": "example-island",
+            "name": "Example Island (not a real cluster)"
+          }
+        ],
+        "nodes": [
+          {
+            "github_handle": "example-handle-one",
+            "gpu_hours": 168.0,
+            "helpful_update_share": 0.9,
+            "island": "example-island",
+            "node_id": "example-node-1",
+            "tokens_processed": 1000000
+          },
+          {
+            "github_handle": "example-handle-two",
+            "gpu_hours": 24.5,
+            "helpful_update_share": 0.75,
+            "node_id": "example-node-2",
+            "tokens_processed": 250000
+          }
+        ],
+        "period": {
+          "end": "2000-01-07",
+          "start": "2000-01-01"
+        },
+        "run": "run0",
+        "schema_version": 1
+      },
+      "name": "example.EXAMPLE.json",
+      "path": "ledger/example.EXAMPLE.json"
+    }
+  ],
+  "people": [
+    {
+      "avatar": {
+        "base64": "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",
+        "type": "image/jpeg"
+      },
+      "commits": 40,
+      "login": "bradlishman"
+    }
+  ]
 }

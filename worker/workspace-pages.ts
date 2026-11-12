@@ -3,8 +3,9 @@
 import { esc } from "./html";
 import { DATASETS, DATASETS_URL, JOIN_NODE_URL, LEDGER_NOTE, MODELS, RUN0_READINESS, RUN0_URL, RUNS, STAGE_LABEL, WEIGHTS_LICENCE, DOCS_URL } from "./program";
 import { answersList, questionnaireForm } from "./member";
+import { DISCORD_URL, pathsFor } from "./starter";
 import { CONTRIBUTIONS, declaredDevices, deviceTotal, vendorMix, type Answers, type Device, type HardwareKind } from "./questionnaire";
-import { ago, badge, dailyChart, DISCORD_URL, donut, icon, kpis, more, panel, progress, workspacePage, type WorkspaceData } from "./workspace";
+import { ago, badge, dailyChart, donut, icon, kpis, more, panel, progress, workspacePage, type WorkspaceData } from "./workspace";
 
 const zeros = () => Array.from({ length: 30 }, () => 0);
 const NO_COMPUTE = "No compute recorded yet. The ledger opens with Run 0.";
@@ -84,7 +85,8 @@ function assignment(d: WorkspaceData): string {
   );
 }
 
-export function overview(d: WorkspaceData): string {
+/** `thanks` is set on the page shown right after the questionnaire is first submitted. */
+export function overview(d: WorkspaceData, thanks = false): string {
   const devices = declaredDevices(d.answers);
   const s = standing(d);
   return workspacePage(
@@ -96,7 +98,7 @@ export function overview(d: WorkspaceData): string {
       lede: "Your compute, training assignments and published evidence, live. Run 0 has not started, so most of this is still zero.",
       actions: `${secondary(DISCORD_URL, "Join the Discord")}${primary(RUN0_URL, "Try Run 0 yourself", "w-play")}`,
     },
-    `${kpis([
+    `${thanks ? '<p class="app-ok" role="status">Thank you for joining. Your answers are saved.</p>' : ""}${kpis([
       { label: "Verified compute", value: "0 h", note: "GPU-equivalent total", href: "/console/contributions" },
       { label: "Connected nodes", value: "0", note: `${deviceTotal(devices)} declared at sign-up`, href: "/console/nodes" },
       { label: "Training runs", value: "0", note: "Participated in", flag: "Run 0 forming", href: "/console/runs" },
@@ -109,7 +111,20 @@ ${assignment(d)}
 <div class="ws-grid ws-grid-even">
 ${panel("Your compute nodes", more("/console/nodes", "Manage nodes"), deviceRows(devices, d.answers))}
 ${panel("Recent activity", "", activity(d))}
-</div>`,
+</div>
+${starterIssues(d.answers)}`,
+  );
+}
+
+function starterIssues(a: Answers): string {
+  const paths = pathsFor(a.contributions)
+    .map((p) => `<li><a href="${esc(p.href)}" rel="noopener"><b>${esc(p.title)}</b><span>${esc(p.what)}</span><small>${esc(p.linkText)}${icon("w-ext")}</small></a></li>`)
+    .join("");
+  const matched = a.contributions.length > 0 ? "Matched to what you said you can contribute." : "You did not pick a contribution yet, so here is every path.";
+  return panel(
+    "Start here: starter issues for you",
+    more(DISCORD_URL, "Ask in Discord"),
+    `<p class="ws-lead">${matched} Each link is a live GitHub search of open good first issues; say hello in the Discord and ask for one to be assigned to you.</p><ul class="ws-paths">${paths}</ul>`,
   );
 }
 

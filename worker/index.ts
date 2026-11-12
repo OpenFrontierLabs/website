@@ -40,12 +40,13 @@ interface Ctx {
 
 const viewerOf = (u: db.UserRow): Viewer => ({ login: u.login, avatarUrl: u.avatar_url, isAdmin: u.is_admin === 1 });
 
-/** Where a signed-in person lands: the questionnaire until they have answered it, then the Overview. */
-async function landing(c: Ctx, user: db.UserRow, setCookies: string[] = []): Promise<Response> {
+/** Where a signed-in person lands: the questionnaire until they have answered it, then the Overview
+ * (with a thank-you right after the questionnaire). */
+async function landing(c: Ctx, user: db.UserRow, setCookies: string[] = [], thanks = false): Promise<Response> {
   const v = viewerOf(user);
   const answers = db.parseAnswers(user);
   if (!answers) return html(member.questionnairePage(v, member.prefill(user), {}), 200, setCookies);
-  return html(pages.overview(await workspaceData(c, user, answers)), 200, setCookies);
+  return html(pages.overview(await workspaceData(c, user, answers), thanks), 200, setCookies);
 }
 
 async function workspaceData(c: Ctx, user: db.UserRow, answers: Answers): Promise<WorkspaceData> {
@@ -119,7 +120,7 @@ async function memberRoutes(c: Ctx, user: db.UserRow): Promise<Response> {
   const { pathname } = c.url;
   const answers = db.parseAnswers(user);
   if (pathname === "/join/questionnaire") {
-    if (c.req.method === "POST") return saveQuestionnaire(c, user, (e, a) => member.questionnairePage(v, a, e), (saved) => landing(c, saved));
+    if (c.req.method === "POST") return saveQuestionnaire(c, user, (e, a) => member.questionnairePage(v, a, e), (saved) => landing(c, saved, [], true));
     return answers ? html(pages.settings(await workspaceData(c, user, answers), answers, {}, false)) : landing(c, user);
   }
   if (!answers) return landing(c, user);

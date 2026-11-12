@@ -35,7 +35,7 @@ paths:
         "503": { description: GitHub sign-in not configured, content: { text/html: {} } }
   /console:
     get:
-      summary: "Workspace: Overview (verified compute, declared nodes, Run 0 assignment, waitlist place, own status history)"
+      summary: "Workspace: Overview (verified compute, declared nodes, Run 0 assignment, waitlist place, own status history, starter issues matched to the answers)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
@@ -123,7 +123,7 @@ paths:
       summary: Save questionnaire answers
       requestBody: { content: { application/x-www-form-urlencoded: {} } }
       responses:
-        "200": { description: HTML page, content: { text/html: {} } }
+        "200": { description: Overview with a thank-you plus the Discord invite and matched starter issues, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
         "422": { description: Validation errors, form re-rendered, content: { text/html: {} } }
   /console/profile:

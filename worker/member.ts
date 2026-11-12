@@ -2,7 +2,7 @@
 import type { UserRow } from "./db";
 import { esc, page, type Viewer } from "./html";
 import { CONTRIBUTIONS, EXPERIENCE, HARDWARE, type Answers } from "./questionnaire";
-import { DISCORD_URL } from "./workspace";
+import { DISCORD_URL } from "./starter";
 
 const discordIcon = (cls: string) =>
   `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4a20 20 0 0 0-4.9-1.6l-.7 1.3a18 18 0 0 0-5.4 0L8.6 3a20 20 0 0 0-5 1.5q-4.4 7-3.5 13.7a20 20 0 0 0 6 3h.1q.8-1 1.2-2l-1.9-1V18l.4-.3c4 1.8 8.3 1.8 12.1 0h.1l.4.3v.1l-1.9 1q.5 1 1.2 2a20 20 0 0 0 6-3h.1q.7-7.7-3.5-13.7M8 15.4c-1.2 0-2.1-1.1-2.1-2.5s1-2.4 2.1-2.4 2.2 1 2.2 2.4-1 2.4-2.2 2.4m8 0c-1.2 0-2.2-1.1-2.2-2.5s1-2.4 2.2-2.4 2.2 1 2.1 2.4q-.1 2.3-2.1 2.4"/></svg>`;
