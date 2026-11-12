@@ -7,7 +7,7 @@ make setup    # bun install
 make migrate  # apply D1 migrations to the local database
 make dev      # build, then wrangler dev with local D1 (secrets in .dev.vars)
 make check    # build, typecheck, lint, tests
-make release  # build, apply D1 migrations remotely, wrangler deploy
+make release  # build, then D1 migrations + wrangler deploy with a broker-minted token
 ```
 
 Secrets (`wrangler secret put`): `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`; `GITHUB_CLIENT_ID` goes in `[vars]`. Until both GitHub values exist, `/auth/github` answers 503. Local `.dev.vars` needs `SESSION_SECRET` and `APP_ORIGIN=http://localhost:<port>`. Operators are active admins of the OpenFrontierLabs org, or the logins in `ADMIN_GITHUB_LOGINS`.
