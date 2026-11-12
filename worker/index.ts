@@ -52,15 +52,21 @@ async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   const cache = caches.default;
   let count = (await cache.match(key))?.headers.get("x-count") ?? null;
   if (count === null) {
-    count = String(await db.waitlistCount(c.env.DB));
+    try {
+      count = String(await db.waitlistCount(c.env.DB));
+    } catch (err) {
+      // The count is an optional stat: serve the page without it rather than fail the home page.
+      console.error(err);
+      return res;
+    }
     ctx.waitUntil(cache.put(key, new Response(null, { headers: { "x-count": count, "cache-control": `max-age=${WAITLIST_CACHE_SECONDS}` } })));
   }
   const value = count;
-  return new HTMLRewriter().on("[data-waitlist]", { element: (el) => void el.setInnerContent(value) }).transform(res);
+  return new HTMLRewriter().on("[data-waitlist]", { element: (el) => void el.setInnerContent(`, ${value} on the waitlist`) }).transform(res);
 }
 
 async function startOAuth(c: Ctx): Promise<Response> {
-  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN), 503);
+  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN, false), 503);
   const state = randomToken();
   const authorize = new URL("https://github.com/login/oauth/authorize");
   authorize.search = new URLSearchParams({
@@ -78,7 +84,7 @@ async function finishOAuth(c: Ctx): Promise<Response> {
   const ok = await stateMatches(cookies(c.req.headers.get("cookie")).get(STATE), c.url.searchParams.get("state"), c.env.SESSION_SECRET);
   if (!ok) return html(member.joinPage(STATE_ERROR, c.env.APP_ORIGIN), 400, [clearState]);
   const code = c.url.searchParams.get("code");
-  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN), 503, [clearState]);
+  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN, false), 503, [clearState]);
   if (!code) return html(member.joinPage(GITHUB_ERROR, c.env.APP_ORIGIN), 400, [clearState]);
   let profile;
   try {
@@ -158,7 +164,7 @@ async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   if (pathname === "/auth/github") return startOAuth(c);
   if (pathname === "/auth/github/callback") return finishOAuth(c);
   if (pathname === "/logout") return c.req.method === "POST" ? html(member.signedOutPage(), 200, [setCookie(SESSION, "", 0)]) : text("Method not allowed", 405);
-  if (pathname === "/join") return c.user ? landing(c, c.user) : html(member.joinPage(null, c.env.APP_ORIGIN));
+  if (pathname === "/join") return c.user ? landing(c, c.user) : html(member.joinPage(c.env.GITHUB_CLIENT_ID && c.env.GITHUB_CLIENT_SECRET ? null : NOT_CONFIGURED, c.env.APP_ORIGIN, Boolean(c.env.GITHUB_CLIENT_ID && c.env.GITHUB_CLIENT_SECRET)));
   const isOperatorPath = pathname === "/admin" || pathname.startsWith("/admin/");
   const isMemberPath = pathname === "/join/questionnaire" || pathname === "/console" || pathname.startsWith("/console/");
   if (!isOperatorPath && !isMemberPath) return c.env.ASSETS.fetch(c.req);
