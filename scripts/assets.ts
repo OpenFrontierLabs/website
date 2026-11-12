@@ -55,7 +55,8 @@ await emit("arc-hero", sharp(arcBox.data).extend({ top: pad, bottom: pad, left: 
 const poster = sharp(src("poster-hex-576x1024.png"));
 const pm = await poster.metadata();
 const top = Math.round(pm.height! * 0.66);
-await emit("horizon-m", sharp(src("poster-hex-576x1024.png")).extract({ left: 0, top, width: pm.width!, height: pm.height! - top }).resize({ width: 828 }));
+// 640px wide: the mobile LCP image, a soft masked glow behind the hero, needs no more.
+await emit("horizon-m", sharp(src("poster-hex-576x1024.png")).extract({ left: 0, top, width: pm.width!, height: pm.height! - top }).resize({ width: 640 }));
 const bm = await sharp(src("banner-hex-3x1.png")).metadata();
 const btop = Math.round(bm.height! * 0.55);
 await emit("horizon-d", sharp(src("banner-hex-3x1.png")).extract({ left: 0, top: btop, width: bm.width!, height: bm.height! - btop }).resize({ width: 2048 }));
