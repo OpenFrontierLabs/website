@@ -12,8 +12,9 @@ interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
   APP_ORIGIN: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
+  /** Unset until the OpenFrontierLabs OAuth App exists; sign-in then fails closed with 503. */
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
   SESSION_SECRET: string;
   ADMIN_GITHUB_LOGINS: string;
 }
@@ -24,6 +25,7 @@ const WAITLIST_CACHE_SECONDS = 300;
 
 const STATE_ERROR = "That sign-in link expired or was opened in another browser. Try again.";
 const GITHUB_ERROR = "GitHub sign-in did not complete. Try again.";
+const NOT_CONFIGURED = "GitHub sign-in is not switched on yet. Please try again later.";
 
 const text = (body: string, status: number) => new Response(body, { status, headers: { "content-type": "text/plain; charset=utf-8", ...SECURITY_HEADERS } });
 
@@ -58,6 +60,7 @@ async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
 }
 
 async function startOAuth(c: Ctx): Promise<Response> {
+  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN), 503);
   const state = randomToken();
   const authorize = new URL("https://github.com/login/oauth/authorize");
   authorize.search = new URLSearchParams({
@@ -75,6 +78,7 @@ async function finishOAuth(c: Ctx): Promise<Response> {
   const ok = await stateMatches(cookies(c.req.headers.get("cookie")).get(STATE), c.url.searchParams.get("state"), c.env.SESSION_SECRET);
   if (!ok) return html(member.joinPage(STATE_ERROR, c.env.APP_ORIGIN), 400, [clearState]);
   const code = c.url.searchParams.get("code");
+  if (!c.env.GITHUB_CLIENT_ID || !c.env.GITHUB_CLIENT_SECRET) return html(member.joinPage(NOT_CONFIGURED, c.env.APP_ORIGIN), 503, [clearState]);
   if (!code) return html(member.joinPage(GITHUB_ERROR, c.env.APP_ORIGIN), 400, [clearState]);
   let profile;
   try {

@@ -24,11 +24,15 @@ paths:
       summary: Starts GitHub OAuth with a signed state cookie
       responses:
         "302": { description: To github.com/login/oauth/authorize (the only off-site hop) }
+        "503": { description: GitHub sign-in not configured (no OAuth App client ID/secret), content: { text/html: {} } }
   /auth/github/callback:
     get:
       summary: GitHub OAuth callback; checks state, sets the session, renders the questionnaire or Overview
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
+        "400": { description: State mismatch or missing code; join page with the error, content: { text/html: {} } }
+        "502": { description: GitHub token exchange or profile fetch failed, content: { text/html: {} } }
+        "503": { description: GitHub sign-in not configured, content: { text/html: {} } }
   /console:
     get:
       summary: Member Console: Overview (waitlist status and position)
