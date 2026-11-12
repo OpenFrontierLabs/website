@@ -8,8 +8,8 @@ const server = Bun.serve({
   port: 0,
   async fetch(req) {
     const path = new URL(req.url).pathname;
-    const name = path.endsWith("/") ? `${path}index.html` : path.includes(".") ? path : `${path}.html`;
-    const file = Bun.file(join(dist, name));
+    // Mirrors Workers Static Assets html_handling = "auto-trailing-slash": /manifesto serves manifesto.html.
+    const file = Bun.file(join(dist, path.endsWith("/") ? `${path}index.html` : /\.\w+$/.test(path) ? path : `${path}.html`));
     if (!path.includes("..") && (await file.exists())) return new Response(file);
     return new Response(Bun.file(join(dist, "404.html")), { status: 404 });
   },
