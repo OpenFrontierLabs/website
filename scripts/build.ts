@@ -59,6 +59,20 @@ const stats = {
   "%GH_CONTRIBUTORS%": lastPage ?? String(contributorList.length),
 };
 
+// The manifesto is rendered from content/manifesto.md verbatim: paragraphs and **bold** only.
+const escape = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+const [titleLine, ...paragraphs] = (await readFile(join(root, "content/manifesto.md"), "utf8")).trim().split(/\n\s*\n/);
+if (!titleLine?.startsWith("# ")) throw new Error("content/manifesto.md must start with a # title");
+const manifesto = {
+  "%MANIFESTO_TITLE%": escape(titleLine.slice(2)),
+  "%MANIFESTO%": paragraphs
+    .map((p) => {
+      const html = escape(p.replace(/\s*\n\s*/g, " ")).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      return /^\*\*[^*]+\*\*$/.test(p) ? `<p class="m-coda">${html}</p>` : `<p>${html}</p>`;
+    })
+    .join("\n"),
+};
+
 const tw = Bun.spawnSync(
   [join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/styles.css"), "--minify"],
   { cwd: root, stdout: "pipe", stderr: "inherit" },
@@ -75,6 +89,7 @@ for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith("
     .replaceAll("%CSS%", `/assets/${cssName}`)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);
-  await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
+  const filled = Object.entries({ ...stats, ...manifesto }).reduce((h, [k, v]) => h.replaceAll(k, v), html);
+  await writeFile(join(dist, file), withArt(filled));
 }
 console.log(`built dist: ${cssName}, ${fontName}`);

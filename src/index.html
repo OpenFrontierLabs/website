@@ -70,6 +70,7 @@
 <a href="#top" class="brand"><picture><source srcset="%ART:arc-160.avif%" type="image/avif"><source srcset="%ART:arc-160.webp%" type="image/webp"><img src="%ART:arc-160.png%" width="44" height="44" alt="" class="size-10 sm:size-11"></picture><span>Open Frontier Labs</span></a>
 <nav aria-label="Primary" class="hidden items-center gap-7 text-sm text-mist lg:flex">
 <a class="navlink" href="#mission">Mission</a>
+<a class="navlink" href="/manifesto">Manifesto</a>
 <a class="navlink" href="#platform">Platform</a>
 <a class="navlink" href="#community">Community</a>
 <a class="navlink" href="#research">Research</a>
@@ -78,21 +79,24 @@
 </nav>
 <div class="flex items-center gap-3">
 <a class="btn btn-primary btn-sm hidden sm:inline-flex" href="#join"><span>Join the Network</span><svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
-<details class="menu lg:hidden">
-<summary aria-label="Menu"><span></span></summary>
-<div class="menu-panel">
+<a class="menu-btn lg:hidden" href="#menu" aria-label="Open menu" aria-controls="menu"><span></span></a>
+</div>
+</div>
+</header>
+<div class="menu lg:hidden">
+<nav id="menu" class="menu-panel" aria-label="Menu">
 <a href="#mission">Mission</a>
+<a href="/manifesto">Manifesto</a>
 <a href="#platform">Platform</a>
 <a href="#community">Community</a>
 <a href="#research">Research</a>
 <a href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener">Docs</a>
 <a href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a>
 <a href="#join" class="join-link sm:hidden">Join the Network</a>
+</nav>
+<a class="menu-btn menu-close" href="#menu-closed" aria-label="Close menu"><span></span></a>
+<span id="menu-closed" class="menu-anchor"></span>
 </div>
-</details>
-</div>
-</div>
-</header>
 
 <main id="main">
 <section id="top" class="hero">
@@ -114,7 +118,7 @@
 <p class="hero-line">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public. Early stage: nothing has been trained yet.</p>
 <div class="mt-8 flex flex-wrap gap-3">
 <a class="btn btn-primary" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">Get Started <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
-<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener">Read the Spec</a>
+<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/MANIFESTO.md" rel="noopener">Read the Spec</a>
 </div>
 </div>
 </div>
@@ -141,6 +145,17 @@
 <article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-weights"/></svg><h3>Open Weights</h3><p>Every checkpoint and the final weights are planned for release under Apache-2.0.</p></article>
 <article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-hetero"/></svg><h3>Heterogeneous Participation</h3><p>Contribute what you have, from a single consumer GPU to an 8-GPU node.</p></article>
 </div>
+</div>
+</section>
+
+<section id="manifesto" class="section manifesto" aria-labelledby="manifesto-h">
+<div class="wrap-x">
+<article class="manifesto-body reveal">
+<p class="eyebrow">Manifesto</p>
+<h2 id="manifesto-h">%MANIFESTO_TITLE%</h2>
+%MANIFESTO%
+<p class="m-link"><a class="more" href="/manifesto">Read it on its own page <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></p>
+</article>
 </div>
 </section>
 
@@ -173,7 +188,7 @@
 <p>The goal is to welcome the hardware people already own. None of these platforms work yet: this is what we want to build, and we need help.</p>
 </header>
 <div class="grid gap-4 lg:grid-cols-3">
-<article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-chip"/></svg><span class="tag">Planned</span><h3>Apple Silicon / macOS</h3><ul class="chips"><li>M1</li><li>M2</li><li>M3</li><li>M4</li></ul><p>Planned support for M1 to M4 Macs as contributor nodes.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
+<article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-chip"/></svg><span class="tag">Planned</span><h3>Apple Silicon / MLX / Metal</h3><ul class="chips"><li>Apple M5</li><li>Apple M6</li><li>MLX</li><li>Metal</li></ul><p>Planned: Apple M5 and Apple M6 Macs as first-class contributor nodes, training through MLX on Metal. Not built yet.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
 <article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-gpu"/></svg><span class="tag">Planned</span><h3>NVIDIA / CUDA / RTX</h3><ul class="chips"><li>CUDA</li><li>RTX</li><li>GeForce</li></ul><p>The first target: CUDA training from consumer RTX cards up to 8-GPU nodes.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
 <article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-hetero"/></svg><span class="tag">Planned</span><h3>Heterogeneous GPUs</h3><ul class="chips"><li>AMD</li><li>Intel</li><li>Others</li></ul><p>A flexible platform for any consumer or prosumer GPU. Not built yet.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
 </div>
@@ -286,6 +301,7 @@
 </div>
 <ul class="flex flex-wrap items-center gap-x-6 gap-y-3">
 <li><a class="navlink" href="#mission">Mission</a></li>
+<li><a class="navlink" href="/manifesto">Manifesto</a></li>
 <li><a class="navlink" href="#platform">Platform</a></li>
 <li><a class="navlink" href="#community">Community</a></li>
 <li><a class="navlink" href="#research">Research</a></li>
