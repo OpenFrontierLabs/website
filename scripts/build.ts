@@ -39,10 +39,16 @@ const withArt = (html: string) =>
   });
 
 // Real numbers only: GitHub stars and contributors, fetched at build time; 0 when unreachable.
+// GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit that otherwise turns the counts into 0.
+const token = process.env.GITHUB_TOKEN;
 async function github(path: string): Promise<Response | null> {
   try {
     const res = await fetch(`https://api.github.com/repos/OpenFrontierLabs/openfrontier${path}`, {
-      headers: { accept: "application/vnd.github+json", "user-agent": "ofl-website-build" },
+      headers: {
+        accept: "application/vnd.github+json",
+        "user-agent": "ofl-website-build",
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+      },
       signal: AbortSignal.timeout(8000),
     });
     return res.ok ? res : null;
@@ -59,6 +65,28 @@ const stats = {
   "%GH_CONTRIBUTORS%": lastPage ?? String(contributorList.length),
 };
 
+// The manifesto has one source, content/manifesto.md (identical to MANIFESTO.md in OpenFrontierLabs/openfrontier).
+// Principles (a paragraph that opens in bold) and the bold tagline get classes for styling; the words are untouched.
+const manifestoHtml = Bun.markdown.html(await readFile(join(root, "content/manifesto.md"), "utf8"));
+const manifestoTitle = /<h1>(.+?)<\/h1>/.exec(manifestoHtml)?.[1];
+if (!manifestoTitle) throw new Error("content/manifesto.md needs a # title");
+const manifesto = manifestoHtml
+  .replace(/<h1>.+?<\/h1>\n?/, "")
+  .replace(/<p><strong>([^<]+)<\/strong><\/p>/g, '<p class="m-tag"><strong>$1</strong></p>')
+  .replaceAll("<p><strong>", '<p class="m-principle"><strong>');
+
+// Shared markup (icon sprite, nav, footer) lives in src/partials and is inlined as <!--#partial name-->.
+const partials = new Map<string, string>();
+for (const file of await readdir(join(root, "src/partials"))) {
+  partials.set(file.replace(/\.html$/, ""), (await readFile(join(root, "src/partials", file), "utf8")).trimEnd());
+}
+const withPartials = (html: string) =>
+  html.replace(/<!--#partial ([\w-]+)-->/g, (_, name: string) => {
+    const part = partials.get(name);
+    if (part === undefined) throw new Error(`unknown partial ${name}`);
+    return part;
+  });
+
 const tw = Bun.spawnSync(
   [join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/styles.css"), "--minify"],
   { cwd: root, stdout: "pipe", stderr: "inherit" },
@@ -71,7 +99,9 @@ const cssName = `app-${hash(css)}.css`;
 await writeFile(join(dist, "assets", cssName), css);
 
 for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith(".html"))) {
-  const html = (await readFile(join(root, "src", file), "utf8"))
+  const html = withPartials(await readFile(join(root, "src", file), "utf8"))
+    .replaceAll("%MANIFESTO_TITLE%", manifestoTitle)
+    .replaceAll("%MANIFESTO%", manifesto)
     .replaceAll("%CSS%", `/assets/${cssName}`)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);

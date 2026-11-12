@@ -7,33 +7,54 @@ const build = Bun.spawnSync(["bun", join(import.meta.dir, "../scripts/build.ts")
 if (build.exitCode !== 0) throw new Error("build failed");
 const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
-const all = `${index}\n${read("404.html")}`;
+const manifestoPage = read("manifesto.html");
+const pages = { "index.html": index, "manifesto.html": manifestoPage };
+const all = `${index}\n${manifestoPage}\n${read("404.html")}`;
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
-    for (const f of ["index.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon-32.png", "favicon.ico", "og.png", "site.webmanifest"]) {
+    for (const f of ["index.html", "manifesto.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon-32.png", "favicon.ico", "og.png", "site.webmanifest"]) {
       expect(existsSync(join(dist, f))).toBe(true);
     }
     expect(existsSync(join(dist, "_redirects"))).toBe(false);
   });
 
   test("required sections exist", () => {
-    for (const id of ["top", "main", "mission", "how", "platform", "community", "research", "network", "join"]) {
+    for (const id of ["top", "main", "mission", "manifesto", "how", "try", "platform", "community", "research", "network", "join"]) {
       expect(index).toContain(`id="${id}"`);
     }
   });
 
-  test("internal links and anchors resolve", () => {
-    const ids = new Set([...index.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
-    for (const m of index.matchAll(/href="([^"]+)"/g)) {
-      const href = m[1]!;
-      if (href.startsWith("#")) expect(ids.has(href.slice(1))).toBe(true);
-      else if (href.startsWith("/")) expect(existsSync(join(dist, href.split(/[?#]/)[0]!))).toBe(true);
+  test("internal links and anchors resolve on the page they point to", () => {
+    const ids = (html: string) => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+    for (const [name, html] of Object.entries(pages)) {
+      for (const m of html.matchAll(/href="([^"]+)"/g)) {
+        const href = m[1]!;
+        if (href.startsWith("#")) expect(ids(html).has(href.slice(1)), `${name}: ${href}`).toBe(true);
+        else if (href.startsWith("/")) {
+          const [path, frag] = href.split("#") as [string, string | undefined];
+          // Workers html_handling "auto-trailing-slash": / is index.html, /manifesto is manifesto.html.
+          const file = path === "/" ? "index.html" : /\.\w+$/.test(path) ? path.slice(1) : `${path.slice(1)}.html`;
+          expect(existsSync(join(dist, file)), `${name}: ${href}`).toBe(true);
+          if (frag) expect(ids(read(file)).has(frag), `${name}: ${href}`).toBe(true);
+        }
+      }
     }
-    for (const m of all.matchAll(/(?:src|href)="(\/[^"]*)"/g)) {
-      const p = m[1]!.split(/[?#]/)[0]!;
-      expect(p === "/" || existsSync(join(dist, p))).toBe(true);
+    for (const m of all.matchAll(/src(?:set)?="(\/[^"]*)"/g)) {
+      expect(existsSync(join(dist, m[1]!.split(/[?#]/)[0]!))).toBe(true);
     }
+  });
+
+  test("manifesto words are published unedited on both pages", () => {
+    const words = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/&#39;|&apos;/g, "'").replace(/\s+/g, " ").trim();
+    const md = readFileSync(join(import.meta.dir, "../content/manifesto.md"), "utf8");
+    const body = words(md.replace(/^# .*$/m, "").replaceAll("**", ""));
+    for (const html of [index, manifestoPage]) {
+      expect(html).toContain("The Open Frontier Manifesto");
+      const start = html.indexOf('<div class="manifesto-body">');
+      expect(words(html.slice(start, html.indexOf("</div>", start)))).toBe(body);
+    }
+    expect(read("sitemap.xml")).toContain("https://openfrontier-labs.com/manifesto");
   });
 
   test("no link targets a .html path (html_handling would 307 it)", () => {
