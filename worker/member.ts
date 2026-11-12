@@ -37,6 +37,10 @@ ${signInOpen ? `<a class="btn btn-primary" href="${appOrigin}/auth/github"><svg 
 <a class="btn" href="${DISCORD_URL}" rel="noopener">${discordIcon("size-5")}<span>Join the Discord</span></a>
 <p>Not ready to sign up? The Discord is where contributors and compute providers talk first.</p>
 </section>`,
+    {
+      description: "Sign up with GitHub to join the Open Frontier Labs waitlist and say what compute, code or time you can contribute. Nothing has been trained yet; Run 0 is forming.",
+      canonical: `${appOrigin}/join`,
+    },
   );
 }
 

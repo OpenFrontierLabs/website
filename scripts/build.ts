@@ -41,39 +41,43 @@ const withArt = (html: string) =>
 // Real numbers only: the contributor count and the dashboard's activity feed are read from GitHub at
 // build time, and the build fails rather than publish a made-up 0 or an empty feed when GitHub is
 // unreachable or rate-limited. GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
-const token = process.env.GITHUB_TOKEN;
-async function github(path: string): Promise<Response> {
-  const res = await fetch(`https://api.github.com/${path}`, {
-    headers: {
-      accept: "application/vnd.github+json",
-      "user-agent": "ofl-website-build",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!res.ok) throw new Error(`GitHub ${path}: HTTP ${res.status}. Set GITHUB_TOKEN (env) and rebuild.`);
-  return res;
-}
-const contributorsRes = await github("repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1");
-const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
-
-// Recent activity: the latest merged pull requests across the organisation's repositories.
+// Tests set OFL_GITHUB_FIXTURE to a recorded response file so they never depend on GitHub's rate limit;
+// a release never sets it.
 interface Pull {
   number: number;
   title: string;
   html_url: string;
   merged_at: string | null;
 }
+interface GitHubData {
+  contributors: number;
+  pulls: Record<string, Pull[]>;
+}
+const REPOS = ["openfrontier", "website", ".github"];
+async function fromGitHub(): Promise<GitHubData> {
+  const token = process.env.GITHUB_TOKEN;
+  const github = async (path: string) => {
+    const res = await fetch(`https://api.github.com/${path}`, {
+      headers: { accept: "application/vnd.github+json", "user-agent": "ofl-website-build", ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) throw new Error(`GitHub ${path}: HTTP ${res.status}. Set GITHUB_TOKEN (env) and rebuild.`);
+    return res;
+  };
+  const contributorsRes = await github("repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1");
+  const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
+  const contributors = lastPage ? Number(lastPage) : ((await contributorsRes.json()) as unknown[]).length;
+  const pulls = Object.fromEntries(
+    await Promise.all(REPOS.map(async (repo) => [repo, (await (await github(`repos/OpenFrontierLabs/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`)).json()) as Pull[]])),
+  );
+  return { contributors, pulls };
+}
+const fixture = process.env.OFL_GITHUB_FIXTURE;
+const gh: GitHubData = fixture ? JSON.parse(await readFile(fixture, "utf8")) : await fromGitHub();
+
+// Recent activity: the latest merged pull requests across the organisation's repositories.
 const escapeHtml = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-const merged = (
-  await Promise.all(
-    ["openfrontier", "website", ".github"].map(async (repo) => {
-      const pulls = (await (await github(`repos/OpenFrontierLabs/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`)).json()) as Pull[];
-      return pulls.filter((p) => p.merged_at !== null).map((p) => ({ ...p, repo, mergedAt: p.merged_at! }));
-    }),
-  )
-)
-  .flat()
+const merged = REPOS.flatMap((repo) => (gh.pulls[repo] ?? []).filter((p) => p.merged_at !== null).map((p) => ({ ...p, repo, mergedAt: p.merged_at! })))
   .sort((a, b) => b.mergedAt.localeCompare(a.mergedAt))
   .slice(0, 6);
 if (merged.length === 0) throw new Error("GitHub returned no merged pull requests for the activity feed");
@@ -86,7 +90,7 @@ const activity = merged
   .join("\n");
 
 const stats = {
-  "%GH_CONTRIBUTORS%": lastPage ?? String(((await contributorsRes.json()) as unknown[]).length),
+  "%GH_CONTRIBUTORS%": String(gh.contributors),
   "%ACTIVITY%": activity,
 };
 
@@ -120,27 +124,30 @@ if (tw.exitCode !== 0) throw new Error("tailwindcss failed");
 const css = tw.stdout.toString()
   .replaceAll("/assets/inter.woff2", `/assets/${fontName}`)
   .replaceAll("/assets/michroma.woff2", `/assets/${displayName}`);
-const cssName = `app-${hash(css)}.css`;
-await writeFile(join(dist, "assets", cssName), css);
 
 // The dashboard's own styles ship only with /dashboard, so the home page doesn't carry them.
 const dashTw = Bun.spawnSync([join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/dashboard.css"), "--minify"], { cwd: root, stdout: "pipe", stderr: "inherit" });
 if (dashTw.exitCode !== 0) throw new Error("tailwindcss failed on src/dashboard.css");
 const dashCss = dashTw.stdout.toString();
-const dashCssName = `dash-${hash(dashCss)}.css`;
-await writeFile(join(dist, "assets", dashCssName), dashCss);
+
+// Styles are inlined: first paint waits for the HTML alone, not a second request. The CSP admits each
+// inline stylesheet by its SHA-256, so `style-src` never needs 'unsafe-inline'.
+const cspHash = (text: string) => `'sha256-${createHash("sha256").update(text).digest("base64")}'`;
+if (css.includes("</style") || dashCss.includes("</style")) throw new Error("stylesheet text would close its <style> element");
+const headers = await readFile(join(dist, "_headers"), "utf8");
+if (!headers.includes("style-src 'self';")) throw new Error("public/_headers lost its style-src 'self' directive");
+await writeFile(join(dist, "_headers"), headers.replaceAll("style-src 'self';", `style-src 'self' ${cspHash(css)} ${cspHash(dashCss)};`));
 
 for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith(".html"))) {
   const html = withPartials(await readFile(join(root, "src", file), "utf8"))
     .replaceAll("%MANIFESTO_TITLE%", manifestoTitle)
     .replaceAll("%MANIFESTO%", manifesto)
-    .replaceAll("%CSS%", `/assets/${cssName}`)
-    .replaceAll("%DASH_CSS%", `/assets/${dashCssName}`)
-    .replaceAll("%FONT%", `/assets/${fontName}`)
-    .replaceAll("%DISPLAY%", `/assets/${displayName}`);
-  await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
+    .replaceAll('<link rel="stylesheet" href="%CSS%">', () => `<style>${css}</style>`)
+    .replaceAll('<link rel="stylesheet" href="%DASH_CSS%">', () => `<style>${dashCss}</style>`);
+  if (html.includes("%CSS%") || html.includes("%DASH_CSS%")) throw new Error(`${file}: stylesheet placeholder outside a <link rel="stylesheet">`);
+  await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, () => v), html)));
 }
-// The Worker renders its own pages (/join, /console, /admin) with the same hashed assets.
-const workerAssets = { css: `/assets/${cssName}`, font: `/assets/${fontName}`, logoWebp: art.get("arc-160.webp"), logoPng: art.get("arc-160.png") };
+// The Worker renders its own pages (/join, /console, /admin) with the same inline stylesheet and hash.
+const workerAssets = { css, cssHash: cspHash(css), logoAvif: art.get("arc-160.avif"), logoWebp: art.get("arc-160.webp"), logoPng: art.get("arc-160.png") };
 await writeFile(join(root, "worker/assets.gen.ts"), `// Generated by scripts/build.ts.\nexport const ASSET = ${JSON.stringify(workerAssets)};\n`);
-console.log(`built dist: ${cssName}, ${fontName}`);
+console.log(`built dist: styles inline (${css.length} + ${dashCss.length} bytes), ${fontName}`);

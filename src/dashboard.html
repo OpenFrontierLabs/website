@@ -20,8 +20,6 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="preload" href="%FONT%" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="%DISPLAY%" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="%ART:horizon-d.avif%" type="image/avif" media="(min-width: 48rem)">
 <link rel="stylesheet" href="%CSS%">
 <link rel="stylesheet" href="%DASH_CSS%">
@@ -33,7 +31,7 @@
 
 <div class="dash">
 <aside class="dash-side">
-<a href="/" class="dash-brand"><img src="/icon-192.png" width="48" height="48" alt=""><span>Open<br>Frontier<br>Labs</span></a>
+<a href="/" class="dash-brand"><picture><source srcset="%ART:hex-96.avif%" type="image/avif"><source srcset="%ART:hex-96.webp%" type="image/webp"><img src="%ART:hex-96.png%" width="96" height="96" alt=""></picture><span>Open<br>Frontier<br>Labs</span></a>
 <p class="dash-tagline">Frontier intelligence.<br>Built together.</p>
 <nav class="dash-nav" aria-label="Dashboard">
 <a href="/dashboard" aria-current="page"><svg aria-hidden="true"><use href="#i-home"/></svg>Dashboard</a>

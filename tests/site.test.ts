@@ -3,7 +3,11 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const dist = join(import.meta.dir, "../dist");
-const build = Bun.spawnSync(["bun", join(import.meta.dir, "../scripts/build.ts")], { stderr: "inherit" });
+// Recorded GitHub responses: the suite never depends on GitHub's rate limit (a release reads GitHub live).
+const build = Bun.spawnSync(["bun", join(import.meta.dir, "../scripts/build.ts")], {
+  stderr: "inherit",
+  env: { ...process.env, OFL_GITHUB_FIXTURE: join(import.meta.dir, "fixtures/github.json") },
+});
 if (build.exitCode !== 0) throw new Error("build failed");
 const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
@@ -99,11 +103,30 @@ describe("dist", () => {
     expect(h).toContain("frame-ancestors 'none'");
   });
 
-  test("home page html + its css + fonts within raw size budget; images are separate", () => {
-    expect(statSync(join(dist, "index.html")).size).toBeLessThan(60_000);
-    const code = [...new Set([...index.matchAll(/href="\/assets\/([^"]+\.(?:css|woff2))"/g)].map((m) => m[1]!))]
-      .reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
-    expect(code + statSync(join(dist, "index.html")).size).toBeLessThan(150_000);
+  test("home page transfer budget: gzipped html (styles inline) and its fonts; images are separate", () => {
+    const gz = (bytes: Buffer) => Bun.gzipSync(new Uint8Array(bytes)).length;
+    const html = gz(readFileSync(join(dist, "index.html")));
+    expect(html).toBeLessThan(25_000);
+    const fonts = [...new Set([...index.matchAll(/\/assets\/([^)"]+\.woff2)/g)].map((m) => m[1]!))];
+    expect(fonts.length).toBe(2);
+    const fontBytes = fonts.reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
+    expect(html + fontBytes).toBeLessThan(100_000);
+  });
+
+  test("every inline stylesheet is admitted by its hash, never by 'unsafe-inline'", () => {
+    const h = read("_headers");
+    expect(h).not.toContain("unsafe-inline");
+    const csps = h.match(/Content-Security-Policy: [^\n]+/g)!;
+    expect(csps.length).toBe(2);
+    for (const [name, html] of Object.entries({ ...pages, "404.html": read("404.html") })) {
+      expect(html, name).not.toContain('rel="stylesheet"');
+      const styles = [...html.matchAll(/<style>([^]*?)<\/style>/g)].map((m) => m[1]!);
+      expect(styles.length, name).toBeGreaterThan(0);
+      for (const css of styles) {
+        const hash = `'sha256-${new Bun.CryptoHasher("sha256").update(css).digest("base64")}'`;
+        for (const csp of csps) expect(csp, name).toContain(hash);
+      }
+    }
   });
 
   test("hero art is AVIF-first with a PNG fallback and preloaded", () => {

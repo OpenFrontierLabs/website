@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'none'; img-src 'self' data:; style-src 'self'; font-src 'self'; manifest-src 'self'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; img-src 'self' data:; style-src 'self'; font-src 'self'; manifest-src 'self'; script-src 'none'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: same-origin
@@ -9,7 +9,7 @@
 # The dashboard's search box submits to GitHub's repository search.
 /dashboard
   ! Content-Security-Policy
-  Content-Security-Policy: default-src 'none'; img-src 'self' data:; style-src 'self'; font-src 'self'; manifest-src 'self'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action https://github.com; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; img-src 'self' data:; style-src 'self'; font-src 'self'; manifest-src 'self'; script-src 'none'; connect-src 'self'; base-uri 'none'; form-action https://github.com; frame-ancestors 'none'
 
 /
   Cache-Control: public, max-age=300, must-revalidate

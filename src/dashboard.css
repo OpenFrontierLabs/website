@@ -901,6 +901,8 @@
   }
   .dash-foot a {
     color: var(--color-mist);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   /* motion: CSS only, none of it under reduced motion */

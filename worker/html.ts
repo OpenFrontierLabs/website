@@ -7,10 +7,11 @@ export const esc = (s: unknown) =>
 const CSP = [
   "default-src 'none'",
   "img-src 'self' data: https://avatars.githubusercontent.com",
-  "style-src 'self'",
+  // The stylesheet is inlined (one render-blocking request fewer); its hash is the only inline style allowed.
+  `style-src 'self' ${ASSET.cssHash}`,
   "font-src 'self'",
   "script-src 'none'",
-  "connect-src 'none'",
+  "connect-src 'self'",
   "base-uri 'none'",
   "form-action 'self'",
   "frame-ancestors 'none'",
@@ -49,23 +50,31 @@ function account(v: Viewer | null): string {
   return `<div class="app-account">${v.isAdmin ? '<a class="navlink" href="/admin">Operator Console</a>' : ""}<a class="navlink" href="/console">Member Console</a><span class="app-who">${avatar}${esc(v.login)}</span><form method="post" action="/logout"><button class="btn btn-sm" type="submit">Sign out</button></form></div>`;
 }
 
-export function page(title: string, viewer: Viewer | null, body: string): string {
+/** A public page (only /join) passes `index`: it is crawlable, described and canonical. Everything else stays noindex. */
+export interface PublicMeta {
+  description: string;
+  canonical: string;
+}
+
+export function page(title: string, viewer: Viewer | null, body: string, index?: PublicMeta): string {
+  const meta = index
+    ? `<meta name="description" content="${esc(index.description)}">\n<link rel="canonical" href="${esc(index.canonical)}">`
+    : '<meta name="robots" content="noindex">';
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} | Open Frontier Labs</title>
-<meta name="robots" content="noindex">
+${meta}
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="preload" href="${ASSET.font}" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${ASSET.css}">
+<style>${ASSET.css}</style>
 </head>
 <body>
 <header class="nav"><div class="wrap-x flex h-16 items-center justify-between gap-4">
-<a href="/" class="brand"><picture><source srcset="${ASSET.logoWebp}" type="image/webp"><img src="${ASSET.logoPng}" width="44" height="44" alt="" class="size-10"></picture><span>Open Frontier Labs</span></a>
+<a href="/" class="brand"><picture><source srcset="${ASSET.logoAvif}" type="image/avif"><source srcset="${ASSET.logoWebp}" type="image/webp"><img src="${ASSET.logoPng}" width="160" height="74" alt="" class="brand-mark"></picture><span>Open Frontier Labs</span></a>
 ${account(viewer)}
 </div></header>
 <main id="main" class="wrap-x app-main">

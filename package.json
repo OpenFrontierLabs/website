@@ -6,7 +6,7 @@
     "build": "bun scripts/build.ts",
     "dev": "bun scripts/build.ts && wrangler dev",
     "assets": "bun scripts/assets.ts",
-    "typecheck": "bun scripts/build.ts && tsc --noEmit && tsc --noEmit -p worker",
+    "typecheck": "OFL_GITHUB_FIXTURE=tests/fixtures/github.json bun scripts/build.ts && tsc --noEmit && tsc --noEmit -p worker",
     "lint": "oxlint scripts tests worker",
     "test": "bun test tests/site.test.ts tests/app.test.ts",
     "check": "bun run typecheck && bun run lint && bun run test",

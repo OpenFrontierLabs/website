@@ -52,7 +52,7 @@ export function reviewPage(v: Viewer, rows: UserRow[], counts: Record<Status, nu
   const body = rows
     .map((u) => {
       const a = parseAnswers(u);
-      return `<tr><td>${u.id}</td><td><a class="app-link" href="/admin/review/${u.id}">${esc(u.login)}</a></td><td>${esc(a?.displayName ?? "")}</td><td>${esc(a?.email ?? "")}</td><td>${esc(contributes(a))}</td><td>${esc(hardwareOf(a))}</td><td><span class="pill pill-${u.status}">${u.status}</span></td><td>${esc(u.created_at.slice(0, 10))}</td></tr>`;
+      return `<tr><td>${u.id}</td><td><a class="app-link" href="/admin/review/${u.id}">${esc(u.login)}</a></td><td>${esc(a?.displayName ?? "")}</td><td>${esc(a?.email ?? "")}</td><td>${esc(contributes(a))}</td><td>${esc(hardwareOf(a))}</td><td><span class="status-pill status-${u.status}">${u.status}</span></td><td>${esc(u.created_at.slice(0, 10))}</td></tr>`;
     })
     .join("");
   return shell(
@@ -84,7 +84,7 @@ export function detailPage(v: Viewer, u: UserRow): string {
     "/admin/review",
     `<p><a class="more" href="/admin/review">Back to the Review Queue</a></p>
 <section class="gcard">
-<div class="app-who">${u.avatar_url ? `<img class="app-avatar" src="${esc(u.avatar_url)}&amp;s=64" width="40" height="40" alt="">` : ""}<h2 class="app-h2"><a class="app-link" href="https://github.com/${esc(u.login)}" rel="noopener">${esc(u.login)}</a></h2><span class="pill pill-${u.status}">${u.status}</span></div>
+<div class="app-who">${u.avatar_url ? `<img class="app-avatar" src="${esc(u.avatar_url)}&amp;s=64" width="40" height="40" alt="">` : ""}<h2 class="app-h2"><a class="app-link" href="https://github.com/${esc(u.login)}" rel="noopener">${esc(u.login)}</a></h2><span class="status-pill status-${u.status}">${u.status}</span></div>
 <p class="muted">GitHub id ${u.github_id}. Signed up ${esc(u.created_at)}. Updated ${esc(u.updated_at)}.</p>
 <form class="app-actions" method="post" action="/admin/review/${u.id}/status">${buttons}</form>
 ${a ? answersList(a) : '<p class="muted">Questionnaire not filled in yet.</p>'}

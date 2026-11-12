@@ -1,0 +1,95 @@
+{
+  "contributors": 1,
+  "pulls": {
+    "openfrontier": [
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/openfrontier/pull/4",
+        "merged_at": "2026-11-12T09:19:46Z",
+        "number": 4,
+        "title": "Map compute ledger to Mode A in architecture doc"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/openfrontier/pull/3",
+        "merged_at": "2026-11-12T09:17:44Z",
+        "number": 3,
+        "title": "Add architecture doc with stack diagram and layer status"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/openfrontier/pull/2",
+        "merged_at": "2026-11-12T09:02:32Z",
+        "number": 2,
+        "title": "Add Open Frontier manifesto"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/openfrontier/pull/1",
+        "merged_at": "2026-11-12T08:52:43Z",
+        "number": 1,
+        "title": "Seed openfrontier: docs, ofl CLI, phased configs, CPU smoke"
+      }
+    ],
+    "website": [
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/13",
+        "merged_at": "2026-11-12T10:19:54Z",
+        "number": 13,
+        "title": "Wait for deploy tokens to work for D1 too (Agent: omp / anthropic claude-opus-5-5)"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/12",
+        "merged_at": "2026-11-12T10:15:58Z",
+        "number": 12,
+        "title": "Network dashboard at /dashboard (Agent: omp / anthropic claude-opus-5-5)"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/11",
+        "merged_at": "2026-11-12T09:56:23Z",
+        "number": 11,
+        "title": "Fix questionnaire 'Cross-origin request refused' (Agent: OpenFrontierLabs / Grok Bot)"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/10",
+        "merged_at": "2026-11-12T09:53:14Z",
+        "number": 10,
+        "title": "Lock deploy tokens to both IP families (Agent: omp / anthropic claude-opus-5-5)"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/9",
+        "merged_at": "2026-11-12T09:51:37Z",
+        "number": 9,
+        "title": "Guard waitlist stat; honest /join until GitHub sign-in exists"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/8",
+        "merged_at": "2026-11-12T09:50:50Z",
+        "number": 8,
+        "title": "Release through the ms-01 token broker (Agent: omp / anthropic claude-opus-5-5)"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/7",
+        "merged_at": "2026-11-12T09:46:41Z",
+        "number": 7,
+        "title": "Fail closed with 503 until the GitHub OAuth App exists"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/website/pull/6",
+        "merged_at": "2026-11-12T09:42:05Z",
+        "number": 6,
+        "title": "Fail-closed stats, build-before-release, simpler card ring (Agent: omp / anthropic claude-opus-5-5)"
+      }
+    ],
+    ".github": [
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/.github/pull/2",
+        "merged_at": "2026-11-12T09:03:26Z",
+        "number": 2,
+        "title": "Link manifesto; official hex logo"
+      },
+      {
+        "html_url": "https://github.com/OpenFrontierLabs/.github/pull/1",
+        "merged_at": "2026-11-12T08:52:54Z",
+        "number": 1,
+        "title": "Seed org profile, logo and community health files"
+      }
+    ]
+  }
+}
