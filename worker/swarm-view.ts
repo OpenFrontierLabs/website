@@ -49,9 +49,9 @@ const STATE_LABEL: Record<string, string> = { waiting: "Waiting for nodes", trai
 /** Validation loss per round as an SVG line, from the held-out loss before round 0 to the latest round. */
 function lossChart(run: LatestRun): string {
   const w = 560;
-  const h = 190;
-  const padL = 40;
-  const padB = 24;
+  const h = 210;
+  const padL = 46;
+  const padB = 30;
   const padT = 10;
   const points: { x: number; y: number }[] = [];
   if (run.initial_val_loss !== null) points.push({ x: 0, y: run.initial_val_loss });
@@ -67,7 +67,7 @@ function lossChart(run: LatestRun): string {
     .map((v) => `<line x1="${padL}" x2="${w - 8}" y1="${py(v).toFixed(1)}" y2="${py(v).toFixed(1)}"/><text x="${padL - 6}" y="${(py(v) + 3).toFixed(1)}" text-anchor="end">${v.toFixed(1)}</text>`)
     .join("");
   const xTicks = [0, Math.round(maxX / 2), maxX]
-    .map((v) => `<text x="${px(v).toFixed(1)}" y="${h - 6}" text-anchor="middle">${v}</text>`)
+    .map((v) => `<text x="${px(v).toFixed(1)}" y="${h - 8}" text-anchor="middle">${v}</text>`)
     .join("");
   const label = `Validation loss by round: ${points.length === 0 ? "no rounds yet" : `${loss(points[0]!.y)} before training, ${loss(last!.y)} after ${run.rounds_done} of ${run.rounds} rounds`}`;
   return `<figure class="vl"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><g class="vl-grid">${grid}${xTicks}</g>${

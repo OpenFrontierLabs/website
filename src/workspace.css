@@ -1079,7 +1079,10 @@
   .ws-table tbody th a:hover b {
     color: var(--color-frontier);
   }
-  .ws-table tbody th small {
+  .ws-table tbody th small,
+  .ws-table td small {
+    display: block;
+    margin-top: 0.15rem;
     color: var(--color-mist);
     font-size: 0.8rem;
   }

@@ -169,15 +169,14 @@ export function nodes(d: WorkspaceData, selectedKind: string | null): string {
       { label: "Online now", value: `${onlineCount(d.swarm)} of ${d.swarm.nodes.length}`, note: "Heartbeat in the last 2 minutes" },
       { label: "Node compute", value: duration(totalSeconds(d.swarm)), note: `${totalRounds(d.swarm)} rounds trained` },
     ])}
-<div class="ws-grid ws-grid-even">
 ${panel(
-  "Node inventory",
-  `<span class="ws-tag">${d.swarm.nodes.length} registered · ${devices.length} declared</span>`,
+  "Registered nodes",
+  `<span class="ws-tag">${d.swarm.nodes.length} registered</span>`,
   `${d.swarm.nodes.length > 0 ? nodeTable(d.swarm.nodes, d.now.getTime()) : `<div class="ws-empty">${icon("w-server")}<p><b>No node registered to @${esc(d.v.login)}.</b> Start a node with <code>${esc(nodeCommand(d.v.login))}</code>; it appears here within seconds.</p></div>`}
-<h4 class="ws-h4">Declared at sign-up</h4>
-${deviceRows(devices, d.answers, sel?.kind)}
 <div class="ws-callout"><b>Join a node today</b><p>Nodes join with <code>ofl node join</code> against a coordinator, as a proof of concept over Tailscale; the Node app is planned. <code>make doctor</code> in the openfrontier repository checks a machine first: GPU, CUDA, disk and network, no GPU required.</p>${secondary(JOIN_NODE_URL, "Joining a node")}</div>`,
 )}
+<div class="ws-grid ws-grid-even">
+${panel("Declared at sign-up", `<span class="ws-tag">${devices.length} declared</span>`, deviceRows(devices, d.answers, sel?.kind))}
 ${detail}
 </div>`,
   );
