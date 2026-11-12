@@ -1,0 +1,26 @@
+{
+  "unversioned_paths": [
+    "/",
+    "/join",
+    "/auth/github",
+    "/auth/github/callback",
+    "/console",
+    "/console/nodes",
+    "/console/contributions",
+    "/console/runs",
+    "/console/teams",
+    "/admin",
+    "/admin/training",
+    "/admin/network",
+    "/admin/security",
+    "/admin/review",
+    "/admin/review.csv",
+    "/admin/review/{id}",
+    "/admin/audit",
+    "/join/questionnaire",
+    "/console/profile",
+    "/admin/review/{id}/status",
+    "/logout"
+  ],
+  "reason": "Server-rendered browser pages and the OAuth callback URL registered with GitHub; no programmatic API, so no /v1 segment."
+}
