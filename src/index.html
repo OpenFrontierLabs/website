@@ -6,7 +6,7 @@
 <title>Open Frontier Labs: open infrastructure for collective frontier intelligence</title>
 <meta name="description" content="A community lab building fully open models (data, code, recipes, checkpoints, logs and weights) on pooled, distributed community compute.">
 <link rel="canonical" href="https://openfrontier-labs.com/">
-<meta name="theme-color" content="#0B0E0D">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Open Frontier Labs">
@@ -16,16 +16,20 @@
 <meta property="og:image" content="https://openfrontier-labs.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Open Frontier Labs logo: a green arc horizon and a star above a road converging to a vanishing point.">
+<meta property="og:image:alt" content="Open Frontier Labs: a green arc horizon and a star above a glowing earth, with the tagline Frontier intelligence. Built together.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Open Frontier Labs">
 <meta name="twitter:description" content="Open infrastructure for collective frontier intelligence.">
 <meta name="twitter:image" content="https://openfrontier-labs.com/og.png">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="%FONT%" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="%DISPLAY%" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="%ART:mark-448.avif%" type="image/avif" fetchpriority="high">
+<link rel="preload" as="image" href="%ART:horizon-m.avif%" type="image/avif" media="(max-width: 47.99rem)">
+<link rel="preload" as="image" href="%ART:horizon-d.avif%" type="image/avif" media="(min-width: 48rem)">
 <link rel="stylesheet" href="%CSS%">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Open Frontier Labs","url":"https://openfrontier-labs.com/","logo":"https://openfrontier-labs.com/icon-512.png","description":"Open infrastructure for collective frontier intelligence.","sameAs":["https://github.com/OpenFrontierLabs","https://x.com/openfrontlabs"]}</script>
 </head>
@@ -34,7 +38,9 @@
 
 <header class="sticky top-0 z-40 border-b border-white/10 bg-graphite/85 backdrop-blur">
 <div class="wrap flex h-14 items-center justify-between gap-4">
-<a href="#top" class="text-sm font-semibold tracking-[0.2em] text-soft">OPEN FRONTIER LABS</a>
+<a href="#top" class="flex items-center gap-3 font-display text-xs tracking-[0.22em] text-soft">
+<picture><source srcset="%ART:mark-96.avif%" type="image/avif"><source srcset="%ART:mark-96.webp%" type="image/webp"><img src="%ART:mark-96.png%" width="32" height="32" alt="" class="size-8"></picture>
+OPEN FRONTIER LABS</a>
 <nav aria-label="Primary" class="flex items-center gap-6 text-sm text-mist">
 <a href="#manifesto" class="hidden hover:text-soft md:inline">Manifesto</a>
 <a href="#pillars" class="hidden hover:text-soft md:inline">Pillars</a>
@@ -46,16 +52,33 @@
 </header>
 
 <main id="main">
-<section id="top" class="hero-glow relative overflow-hidden pb-20 pt-12 sm:pt-16">
-<div class="wrap flex flex-col items-center text-center">
-<!--LOGO-->
-<h1 class="mt-8 max-w-3xl text-balance text-[clamp(2rem,1.2rem+4vw,3.75rem)] font-bold leading-[1.06] tracking-tight">Open infrastructure for collective frontier intelligence</h1>
-<p class="lede mx-auto">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public.</p>
-<div class="mt-9 flex flex-wrap justify-center gap-3">
+<section id="top" class="relative isolate overflow-hidden pt-10 sm:pt-14">
+<div class="wrap relative z-10 flex flex-col items-center text-center">
+<picture><source srcset="%ART:mark-448.avif%" type="image/avif"><source srcset="%ART:mark-448.webp%" type="image/webp"><img src="%ART:mark-448.png%" width="448" height="448" alt="Open Frontier Labs mark: a green hexagon with a star at its centre" class="mark" fetchpriority="high" decoding="async"></picture>
+<h1 class="wordmark mt-4"><span>Open</span> <span>Frontier</span> <span>Labs</span></h1>
+<p class="brackets mt-10"><span class="bracket-line">Frontier intelligence.</span> <span class="bracket-line text-frontier">Built together.</span></p>
+<ul class="pillars mt-12" aria-label="What open means here">
+<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M16 4 28 10 16 16 4 10Z"/><path d="M4 15.5 16 21.5 28 15.5"/><path d="M4 21 16 27 28 21"/></svg><span>Open<br>Compute</span></li>
+<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M16 5 26 24H6Z"/><circle cx="16" cy="5" r="2.6" fill="currentColor"/><circle cx="26" cy="24" r="2.6" fill="currentColor"/><circle cx="6" cy="24" r="2.6" fill="currentColor"/></svg><span>Open<br>Training</span></li>
+<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 9 4 16l7 7"/><path d="M21 9l7 7-7 7"/><path d="M18 7 14 25"/></svg><span>Open<br>Weights</span></li>
+</ul>
+</div>
+<div class="horizon relative z-0 mt-6 sm:mt-10">
+<picture>
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.avif%" type="image/avif">
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.webp%" type="image/webp">
+<source srcset="%ART:horizon-m.avif%" type="image/avif">
+<source srcset="%ART:horizon-m.webp%" type="image/webp">
+<img src="%ART:horizon-m.png%" width="828" height="486" alt="" class="horizon-img" decoding="async">
+</picture>
+<div class="horizon-copy wrap">
+<p class="lede mx-auto text-center">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public.</p>
+<div class="mt-8 flex flex-wrap justify-center gap-3">
 <a class="btn btn-primary" href="#join">Join the lab</a>
 <a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a>
 </div>
-<p class="mt-8 text-sm text-mist">Early stage. Nothing has been trained yet.</p>
+<p class="mt-6 text-sm text-mist">Early stage. Nothing has been trained yet.</p>
+</div>
 </div>
 </section>
 
@@ -113,7 +136,7 @@
 <h3>Elastic mesh</h3>
 <svg class="mt-4 w-full" viewBox="0 0 240 90" fill="none" role="img" aria-label="Mesh of islands joined by thin links">
 <g stroke="#66E36E" stroke-opacity=".55" stroke-width="1.2"><path d="M30 20 120 45 210 20M30 70 120 45 210 70M30 20 30 70M210 20 210 70M30 20 210 70M210 20 30 70"/></g>
-<g fill="#0B0E0D" stroke="#66E36E" stroke-width="2"><circle cx="30" cy="20" r="9"/><circle cx="210" cy="20" r="9"/><circle cx="30" cy="70" r="9"/><circle cx="210" cy="70" r="9"/></g>
+<g fill="#000000" stroke="#66E36E" stroke-width="2"><circle cx="30" cy="20" r="9"/><circle cx="210" cy="20" r="9"/><circle cx="30" cy="70" r="9"/><circle cx="210" cy="70" r="9"/></g>
 <circle cx="120" cy="45" r="11" fill="#66E36E"/>
 </svg>
 <p>Merges updates across islands and catches new nodes up from a live checkpoint.</p>
@@ -192,7 +215,7 @@ ofl join run1</code></pre>
 <footer class="border-t border-white/10 py-12 text-sm text-mist">
 <div class="wrap flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
 <div class="max-w-md">
-<p class="font-semibold tracking-[0.2em] text-soft">OPEN FRONTIER LABS</p>
+<p class="flex items-center gap-3 font-display text-xs tracking-[0.22em] text-soft"><picture><source srcset="%ART:arc-160.avif%" type="image/avif"><source srcset="%ART:arc-160.webp%" type="image/webp"><img src="%ART:arc-160.png%" width="48" height="48" alt="" class="size-12" loading="lazy" decoding="async"></picture>OPEN FRONTIER LABS</p>
 <p class="mt-3">Code and weights are planned under Apache-2.0. This site's repository is Apache-2.0 licensed.</p>
 <p class="mt-3">Nothing here is a claim about results.</p>
 </div>

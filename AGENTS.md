@@ -2,8 +2,8 @@
 
 Frontend: static HTML + Tailwind v4 (no framework: single static page; hydrogen/React not warranted)
 
-- Source: `src/index.html`, `src/404.html`, `src/styles.css`; static files in `public/` (including `_headers`); `scripts/build.ts` produces `dist/` with content-hashed CSS and font.
-- Logo: `public/logo.svg` is the single source; the build inlines it into the hero. `bun run assets` regenerates PNG/ICO/OG from SVG (needs `rsvg-convert`).
+- Source: `src/index.html`, `src/404.html`, `src/styles.css`; static files in `public/` (including `_headers`); `scripts/build.ts` produces `dist/` with content-hashed CSS, fonts (Inter body, Michroma display caps) and art.
+- Art: official brand PNGs live in `brand/` (source of truth; no redrawn logos). `bun run assets` (sharp) regenerates `art/` (AVIF/WebP/PNG, content-hashed by the build, referenced as `%ART:file%`) and the icons/OG in `public/`.
 - Deploy target: Cloudflare Workers Static Assets, assets-only (`wrangler.toml`). Deploy: `make release` (`wrangler deploy`), run on a fleet host through `heavy-build-route`.
 - Check: `make check` (typecheck, oxlint, build, `bun test tests/site.test.ts`). Always name the test file.
 

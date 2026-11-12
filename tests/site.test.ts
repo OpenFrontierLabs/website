@@ -11,7 +11,7 @@ const all = `${index}\n${read("404.html")}`;
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
-    for (const f of ["index.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon.svg", "favicon.ico", "og.png", "site.webmanifest"]) {
+    for (const f of ["index.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon-32.png", "favicon.ico", "og.png", "site.webmanifest"]) {
       expect(existsSync(join(dist, f))).toBe(true);
     }
     expect(existsSync(join(dist, "_redirects"))).toBe(false);
@@ -64,10 +64,18 @@ describe("dist", () => {
     expect(h).toContain("frame-ancestors 'none'");
   });
 
-  test("index within size budget (html + css + font gzip-agnostic raw cap)", () => {
+  test("html + css + fonts within raw size budget; images are separate", () => {
     expect(statSync(join(dist, "index.html")).size).toBeLessThan(40_000);
-    const assets = readdirSync(join(dist, "assets")).reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
-    expect(assets + statSync(join(dist, "index.html")).size).toBeLessThan(100_000);
+    const code = readdirSync(join(dist, "assets"))
+      .filter((f) => /\.(css|woff2)$/.test(f))
+      .reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
+    expect(code + statSync(join(dist, "index.html")).size).toBeLessThan(130_000);
+  });
+
+  test("every hero-critical image is AVIF-first with a PNG fallback", () => {
+    expect(index).toMatch(/<source srcset="\/assets\/mark-448-\w+\.avif" type="image\/avif">/);
+    expect(index).toMatch(/<img src="\/assets\/mark-448-\w+\.png"/);
+    expect(index).toMatch(/rel="preload" as="image" href="\/assets\/mark-448-\w+\.avif"/);
   });
 
   test("og.png is 1200x630", () => {

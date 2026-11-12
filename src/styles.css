@@ -4,10 +4,11 @@
 @theme {
   --color-frontier: #66e36e;
   --color-compute: #1b7f46;
-  --color-graphite: #0b0e0d;
+  --color-graphite: #000;
   --color-silver: #6b7177;
   --color-mist: #a1a8ad;
   --color-soft: #f5f7f6;
+  --font-display: "Michroma", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -17,6 +18,14 @@
   font-display: swap;
   font-weight: 100 900;
   src: url(/assets/inter.woff2) format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Michroma";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(/assets/michroma.woff2) format("woff2");
 }
 
 @layer base {
@@ -63,10 +72,12 @@
   }
   .h2 {
     margin-top: 0.75rem;
-    font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.75rem);
-    font-weight: 650;
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(1.25rem, 0.9rem + 1.8vw, 2rem);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
     text-wrap: balance;
   }
   .lede {
@@ -149,13 +160,100 @@
   .code .dim {
     color: var(--color-mist);
   }
-  .hero-glow {
-    background: radial-gradient(60% 55% at 50% 30%, rgb(27 127 70 / 0.28), transparent 70%);
-  }
-  .logo {
-    width: min(78vw, 22rem);
+  .mark {
+    width: min(56vw, 16rem);
     height: auto;
-    overflow: visible;
+    aspect-ratio: 1;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 0.9rem + 5.2vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    max-width: 14ch;
+  }
+  .wordmark span {
+    display: block;
+  }
+  @media (min-width: 48rem) {
+    .wordmark {
+      max-width: none;
+    }
+    .wordmark span {
+      display: inline;
+    }
+  }
+  .brackets {
+    position: relative;
+    max-width: 30rem;
+    padding: 1.1rem 1.6rem;
+    font-family: var(--font-display);
+    font-size: clamp(0.62rem, 0.5rem + 1.3vw, 0.95rem);
+    letter-spacing: 0.3em;
+    line-height: 1.9;
+    text-transform: uppercase;
+    background:
+      linear-gradient(var(--color-frontier), var(--color-frontier)) top left / 1.1rem 2px no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) top left / 2px 1.1rem no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) top right / 1.1rem 2px no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) top right / 2px 1.1rem no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) bottom left / 1.1rem 2px no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) bottom left / 2px 1.1rem no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) bottom right / 1.1rem 2px no-repeat,
+      linear-gradient(var(--color-frontier), var(--color-frontier)) bottom right / 2px 1.1rem no-repeat;
+  }
+  .bracket-line {
+    display: block;
+  }
+  .pillars {
+    display: grid;
+    width: min(100%, 32rem);
+    grid-template-columns: repeat(3, 1fr);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    line-height: 1.7;
+    text-transform: uppercase;
+  }
+  .pillars li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    padding-inline: 0.5rem;
+  }
+  .pillars li + li {
+    border-left: 1px solid rgb(255 255 255 / 0.18);
+  }
+  .pillars svg {
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-frontier);
+  }
+  .horizon-img {
+    position: absolute;
+    inset: auto 0 0;
+    width: 100%;
+    height: 17rem;
+    object-fit: cover;
+    object-position: center top;
+    z-index: -1;
+    mask-image: linear-gradient(transparent 0, #000 35%);
+  }
+  .horizon-copy {
+    position: relative;
+    z-index: 1;
+    padding-block: 3rem 15rem;
+    text-align: center;
+  }
+  @media (min-width: 48rem) {
+    .horizon-img {
+      height: 20rem;
+    }
+    .horizon-copy {
+      padding-block: 2rem 15rem;
+    }
   }
   .flow-link {
     display: flex;
@@ -184,30 +282,6 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .ofl-nodes circle {
-    animation: ofl-pulse 5s ease-in-out infinite;
-  }
-  .ofl-n2 { animation-delay: -0.8s; }
-  .ofl-n3 { animation-delay: -1.7s; }
-  .ofl-n4 { animation-delay: -2.5s; }
-  .ofl-n5 { animation-delay: -3.3s; }
-  .ofl-n6 { animation-delay: -4.2s; }
-  .ofl-arc-glow {
-    animation: ofl-glow 6s ease-in-out infinite;
-  }
-  @keyframes ofl-pulse {
-    0%, 100% { opacity: 0.25; }
-    50% { opacity: 0.85; }
-  }
-  @keyframes ofl-glow {
-    0%, 100% { opacity: 0.55; }
-    50% { opacity: 0.95; }
-  }
-}
-.ofl-nodes circle {
-  opacity: 0.5;
-}
 .code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
