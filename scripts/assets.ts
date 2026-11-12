@@ -42,10 +42,12 @@ const trimmed = await sharp(hex).trim({ threshold: 4 }).toBuffer({ resolveWithOb
 const square = (buf: Buffer, size: number, pad = 0) =>
   sharp(buf).resize(size - pad * 2, size - pad * 2, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } });
-await emit("mark-448", square(hex, 448));
-await emit("mark-96", square(hex, 96));
-const arc = await transparent("arc-logo-1024.png", 1024);
-await emit("arc-160", square(arc, 160));
+const arcLogo = await transparent("arc-logo-1024.png", 1024);
+await emit("arc-160", square(arcLogo, 160));
+// Hero arc stays opaque (blended with mix-blend-mode: screen on the page): its black is not pure black.
+const arcBox = await sharp(src("arc-logo-1024.png")).trim({ background: "#000", threshold: 24 }).toBuffer({ resolveWithObject: true });
+const pad = 24;
+await emit("arc-hero", sharp(arcBox.data).extend({ top: pad, bottom: pad, left: pad, right: pad, background: "#000" }).resize({ width: 760 }));
 
 // Horizon backgrounds: bottom of the poster (mobile) and of the hex banner (desktop).
 const poster = sharp(src("poster-hex-576x1024.png"));
