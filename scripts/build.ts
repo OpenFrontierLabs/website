@@ -38,31 +38,24 @@ const withArt = (html: string) =>
     return url;
   });
 
-// Real numbers only: GitHub stars and contributors, fetched at build time; 0 when unreachable.
-// GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit that otherwise turns the counts into 0.
+// Real numbers only: the contributor count is read from GitHub at build time, and the build fails
+// rather than publish a made-up 0 when GitHub is unreachable or rate-limited.
+// GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
 const token = process.env.GITHUB_TOKEN;
-async function github(path: string): Promise<Response | null> {
-  try {
-    const res = await fetch(`https://api.github.com/repos/OpenFrontierLabs/openfrontier${path}`, {
-      headers: {
-        accept: "application/vnd.github+json",
-        "user-agent": "ofl-website-build",
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-    return res.ok ? res : null;
-  } catch {
-    return null;
-  }
+const contributorsRes = await fetch("https://api.github.com/repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1", {
+  headers: {
+    accept: "application/vnd.github+json",
+    "user-agent": "ofl-website-build",
+    ...(token ? { authorization: `Bearer ${token}` } : {}),
+  },
+  signal: AbortSignal.timeout(8000),
+});
+if (!contributorsRes.ok) {
+  throw new Error(`GitHub contributors: HTTP ${contributorsRes.status}. Set GITHUB_TOKEN (env) and rebuild.`);
 }
-const repo = (await (await github(""))?.json()) as { stargazers_count?: number } | undefined;
-const contributorsRes = await github("/contributors?per_page=1&anon=1");
-const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes?.headers.get("link") ?? "")?.[1];
-const contributorList = contributorsRes ? ((await contributorsRes.json()) as unknown[]) : [];
+const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
 const stats = {
-  "%GH_STARS%": String(repo?.stargazers_count ?? 0),
-  "%GH_CONTRIBUTORS%": lastPage ?? String(contributorList.length),
+  "%GH_CONTRIBUTORS%": lastPage ?? String(((await contributorsRes.json()) as unknown[]).length),
 };
 
 // The manifesto has one source, content/manifesto.md (identical to MANIFESTO.md in OpenFrontierLabs/openfrontier).
