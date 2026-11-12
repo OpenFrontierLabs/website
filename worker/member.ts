@@ -2,6 +2,7 @@
 import type { Status, UserRow } from "./db";
 import { empty, esc, page, tabs, type Viewer } from "./html";
 import { CONTRIBUTIONS, EXPERIENCE, HARDWARE, type Answers } from "./questionnaire";
+import { DISCORD_URL, pathsFor } from "./starter";
 
 export const MEMBER_TABS = [
   { href: "/console", label: "Overview" },
@@ -11,8 +12,6 @@ export const MEMBER_TABS = [
   { href: "/console/teams", label: "Teams" },
   { href: "/console/profile", label: "Profile / Settings" },
 ];
-
-const DISCORD_URL = "https://discord.gg/M4sD8T5M8D";
 
 const discordIcon = (cls: string) =>
   `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4a20 20 0 0 0-4.9-1.6l-.7 1.3a18 18 0 0 0-5.4 0L8.6 3a20 20 0 0 0-5 1.5q-4.4 7-3.5 13.7a20 20 0 0 0 6 3h.1q.8-1 1.2-2l-1.9-1V18l.4-.3c4 1.8 8.3 1.8 12.1 0h.1l.4.3v.1l-1.9 1q.5 1 1.2 2a20 20 0 0 0 6-3h.1q.7-7.7-3.5-13.7M8 15.4c-1.2 0-2.1-1.1-2.1-2.5s1-2.4 2.1-2.4 2.2 1 2.2 2.4-1 2.4-2.2 2.4m8 0c-1.2 0-2.2-1.1-2.2-2.5s1-2.4 2.2-2.4 2.2 1 2.1 2.4q-.1 2.3-2.1 2.4"/></svg>`;
@@ -129,13 +128,19 @@ const STATUS_COPY: Record<Status, string> = {
   rejected: "Your sign-up was not accepted",
 };
 
-export function overviewPage(v: Viewer, u: UserRow, position: number): string {
+/** `thanks` is set on the page shown right after the questionnaire is first submitted. */
+export function overviewPage(v: Viewer, u: UserRow, position: number, answers: Answers, thanks = false): string {
   const status = u.status === "waitlisted" ? `${STATUS_COPY.waitlisted}, #${position}` : STATUS_COPY[u.status];
+  const paths = pathsFor(answers.contributions)
+    .map((p) => `<li class="gcard tile"><h3>${esc(p.title)}</h3><p>${esc(p.what)}</p><a class="more" href="${esc(p.href)}" rel="noopener">${esc(p.linkText)}</a></li>`)
+    .join("");
+  const matched = answers.contributions.length > 0 ? "Matched to what you said you can contribute." : "You did not pick a contribution yet, so here is every path.";
   return memberShell(
     v,
     "/console",
-    `<section class="gcard app-status"><p class="eyebrow">Status</p><h2>${esc(status)}.</h2><p>Signed up ${esc(u.created_at.slice(0, 10))}. We will email you when the first run opens, if you agreed to be contacted.</p><a class="more" href="/console/profile">Your answers and edit form</a></section>
-<section class="gcard"><p class="eyebrow">Community</p><h2 class="app-h2">Join the Discord.</h2><p>Talk to the other contributors, compute providers and researchers in the open Discord server.</p><a class="btn" href="${DISCORD_URL}" rel="noopener">${discordIcon("size-5")}<span>Join the Discord</span></a></section>`,
+    `${thanks ? '<p class="app-ok" role="status">Thank you for joining. Your answers are saved.</p>' : ""}<section class="gcard app-status"><p class="eyebrow">Status</p><h2>${esc(status)}.</h2><p>Signed up ${esc(u.created_at.slice(0, 10))}. We will email you when the first run opens, if you agreed to be contacted.</p><a class="more" href="/console/profile">Your answers and edit form</a></section>
+<section class="gcard"><p class="eyebrow">Community</p><h2 class="app-h2">Join the Discord.</h2><p>Talk to the other contributors, compute providers and researchers in the open Discord server. Say hello there and ask for an issue to be assigned to you.</p><a class="btn" href="${DISCORD_URL}" rel="noopener">${discordIcon("size-5")}<span>Join the Discord</span></a></section>
+<section class="gcard"><p class="eyebrow">Start here</p><h2 class="app-h2">Starter issues for you.</h2><p class="muted">${matched} Issue links are live GitHub searches of open good first issues.</p><ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">${paths}</ul></section>`,
   );
 }
 
