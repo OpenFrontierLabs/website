@@ -1,6 +1,10 @@
-# Open Frontier Labs website. Assets-only Worker: no script, no bindings, no crons.
+# Open Frontier Labs website: static assets plus a Worker for GitHub sign-up, the waitlist
+# (Member Console /console, Operator Console /admin) and the home page waitlist count.
+# Workers + D1 only; no crons, queues, KV, R2 or Durable Objects.
 name = "openfrontier-labs-website"
+main = "worker/index.ts"
 compatibility_date = "2026-11-12"
+account_id = "33c61b47c5fc29b1602641062bb4a58d"
 workers_dev = false
 
 routes = [
@@ -10,5 +14,20 @@ routes = [
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "404-page"
 html_handling = "auto-trailing-slash"
+run_worker_first = ["/", "/join", "/join/*", "/auth/*", "/console", "/console/*", "/admin", "/admin/*", "/logout"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ofl-waitlist"
+database_id = "368d75f8-717d-4f3e-a727-65dd6619d2a7"
+migrations_dir = "migrations"
+
+[vars]
+APP_ORIGIN = "https://openfrontier-labs.com"
+ADMIN_GITHUB_LOGINS = "bradlishman"
+
+[observability]
+enabled = false

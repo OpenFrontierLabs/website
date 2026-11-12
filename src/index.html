@@ -58,14 +58,14 @@
 <p class="hero-sub">Open compute. Open training. Open weights.</p>
 <p class="hero-line">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public. Early stage: nothing has been trained yet.</p>
 <div class="hero-ctas">
-<a class="btn btn-primary" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">Get Started <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
+<a class="btn btn-primary" href="/join">Get Started <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
 <a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/MANIFESTO.md" rel="noopener">Read the Spec</a>
 </div>
 </div>
 </div>
 <div class="wrap-x relative z-10">
 <ul class="stats" aria-label="Network at a glance">
-<li><svg class="ico-sm" aria-hidden="true"><use href="#i-people"/></svg><div><b>%GH_CONTRIBUTORS%</b><span>Contributors on GitHub</span></div></li>
+<li><svg class="ico-sm" aria-hidden="true"><use href="#i-people"/></svg><div><b>%GH_CONTRIBUTORS%</b><span>Contributors on GitHub, <span data-waitlist>0</span> on the waitlist</span></div></li>
 <li><svg class="ico-sm" aria-hidden="true"><use href="#i-gpu"/></svg><div><b>0</b><span>GPUs in network</span></div></li>
 <li><svg class="ico-sm" aria-hidden="true"><use href="#i-train"/></svg><div><b>Run 0</b><span>Forming</span></div></li>
 <li><svg class="ico-sm" aria-hidden="true"><use href="#i-weights"/></svg><div><b>0</b><span>Open artifacts</span></div></li>
@@ -152,6 +152,37 @@
 </div>
 <a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/join-a-node.md" rel="noopener">What works and what does not <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
 </div>
+</div>
+</section>
+
+<section id="stack" class="section" aria-labelledby="stack-h">
+<div class="wrap-x">
+<header class="sec-head reveal">
+<p class="eyebrow">The stack</p>
+<h2 id="stack-h">Eight layers, from your GPU to open models.</h2>
+<p>Today only part of the web platform is live: sign-up and the waitlist. Every other layer is planned.</p>
+</header>
+<ol class="stack" reversed>
+<li class="layer"><span class="layer-n">8</span><div><h3>Outputs</h3><p>Open models, open weights, open checkpoints, open datasets, open research and open training evidence.</p></div><span class="tag">Planned</span></li>
+<li class="layer"><span class="layer-n">7</span><div><h3>Hosting</h3><p>Cloudflare Workers and D1 for the site and app; Durable Objects, R2, regional relay VPSs and Hugging Face publishing come later. The website can be centralized; the training network should not be.</p></div><span class="tag">Planned</span></li>
+<li class="layer layer-live"><span class="layer-n">6</span><div><h3>Web platform</h3><p>This site. Sign-up with GitHub, the waitlist and its questionnaire, the Member Console and the Operator Console's Review Queue work today; the other console tabs wait for the Node app.</p></div><span class="tag tag-live">Live, partly</span></li>
+<li class="layer"><span class="layer-n">5</span><div><h3>Storage and evidence</h3><p>safetensors with manifests, public checkpoints, dataset shards, evidence receipts and an audit trail, on Hugging Face and mirrors.</p></div><span class="tag">Planned</span></li>
+<li class="layer"><span class="layer-n">4</span><div><h3>Training engine</h3><p>Mode A: DiLoCo-style async data parallel with compressed, low-bandwidth sync. Mode B: sharded training with stage placement and elastic recovery. Only a CPU smoke test exists today.</p></div><span class="tag">Planned</span></li>
+<li class="layer"><span class="layer-n">3</span><div><h3>Decentralized network</h3><p>rust-libp2p over QUIC/TCP: bootstrap peers, membership, peer discovery, relays and NAT traversal, signed protocol messages.</p></div><span class="tag">Planned</span></li>
+<li class="layer"><span class="layer-n">2</span><div><h3>Open Frontier Node</h3><p>Runs on contributor machines: hardware discovery, resource limits, checkpoint recovery, local logs, CLI and desktop UI, signed device identity.</p></div><span class="tag">Planned</span></li>
+<li class="layer"><span class="layer-n">1</span><div><h3>Contributor hardware</h3><p>NVIDIA GPUs (CUDA, PyTorch, Triton), Apple Silicon (MLX, Metal, incl. M5/M6), AMD GPUs (ROCm), CPU and test nodes.</p></div><span class="tag">Planned</span></li>
+</ol>
+<h3 class="stack-flow-h">How it works</h3>
+<ol class="stack-flow">
+<li><span class="layer-n">1</span>Contributors join</li>
+<li><span class="layer-n">2</span>The Node app profiles their hardware</li>
+<li><span class="layer-n">3</span>The network assigns work</li>
+<li><span class="layer-n">4</span>Training runs across peers</li>
+<li><span class="layer-n">5</span>Updates are validated</li>
+<li><span class="layer-n">6</span>Checkpoints and evidence are published</li>
+<li><span class="layer-n">7</span>Open models are released</li>
+</ol>
+<p class="stack-img"><a class="more" href="%ART:stack-diagram.webp%">See the full stack diagram <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a> <a class="more" href="%ART:stack-diagram.avif%">(AVIF)</a></p>
 </div>
 </section>
 
@@ -259,9 +290,9 @@
 <p>Contribute compute, build with the protocol, and help advance open frontier intelligence with a global community.</p>
 </header>
 <div class="join-grid">
-<a class="btn btn-primary" href="mailto:openfrontierlabs@gmail.com?subject=Donate%20compute%20to%20Open%20Frontier%20Labs&amp;body=Name%20%2F%20handle%3A%0A%0AGPUs%20and%20count%3A%0A%0ARegion%3A%0A%0ABandwidth%3A%0A%0AAvailability%3A%0A%0AHow%20you%20want%20credit%3A%0A"><svg class="size-5" aria-hidden="true"><use href="#i-mail"/></svg><span>Join the Network <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></span><small>Email a compute offer</small></a>
+<a class="btn btn-primary" href="/join"><svg class="size-5" aria-hidden="true"><use href="#i-gh"/></svg><span>Join the Network <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></span><small>Sign up with GitHub, join the waitlist</small></a>
+<a class="btn" href="mailto:openfrontierlabs@gmail.com?subject=Donate%20compute%20to%20Open%20Frontier%20Labs&amp;body=Name%20%2F%20handle%3A%0A%0AGPUs%20and%20count%3A%0A%0ARegion%3A%0A%0ABandwidth%3A%0A%0AAvailability%3A%0A%0AHow%20you%20want%20credit%3A%0A"><svg class="size-5" aria-hidden="true"><use href="#i-mail"/></svg><span>Donate Compute</span><small>Email a compute offer</small></a>
 <a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/CONTRIBUTING.md" rel="noopener"><svg class="size-5" aria-hidden="true"><use href="#i-code"/></svg><span>Build with the Protocol</span><small>Read how to contribute</small></a>
-<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/docs" rel="noopener"><svg class="size-5" aria-hidden="true"><use href="#i-book"/></svg><span>Explore the Docs</span><small>Run 0, joining a node, phases</small></a>
 <a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener"><svg class="size-5" aria-hidden="true"><use href="#i-gh"/></svg><span>View on GitHub <svg class="size-4" aria-hidden="true"><use href="#i-ext"/></svg></span><small>Open source, open collaboration</small></a>
 </div>
 </div>

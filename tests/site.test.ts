@@ -20,7 +20,7 @@ describe("dist", () => {
   });
 
   test("required sections exist", () => {
-    for (const id of ["top", "main", "mission", "manifesto", "how", "try", "platform", "community", "research", "network", "join"]) {
+    for (const id of ["top", "main", "mission", "manifesto", "how", "stack", "try", "platform", "community", "research", "network", "join"]) {
       expect(index).toContain(`id="${id}"`);
     }
   });
@@ -34,6 +34,7 @@ describe("dist", () => {
         else if (href.startsWith("/")) {
           const [path, frag] = href.split("#") as [string, string | undefined];
           // Workers html_handling "auto-trailing-slash": / is index.html, /manifesto is manifesto.html.
+          if (path === "/join") continue; // served by the Worker (tests/app.test.ts)
           const file = path === "/" ? "index.html" : /\.\w+$/.test(path) ? path.slice(1) : `${path.slice(1)}.html`;
           expect(existsSync(join(dist, file)), `${name}: ${href}`).toBe(true);
           if (frag) expect(ids(read(file)).has(frag), `${name}: ${href}`).toBe(true);

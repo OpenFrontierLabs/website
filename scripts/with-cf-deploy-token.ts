@@ -17,8 +17,14 @@ const TOKEN_TTL_SECONDS = 60 * 60;
 const BROKER_SSH = (process.env.OFL_CF_BROKER_SSH ?? "ssh -o BatchMode=yes -o ConnectTimeout=15 -p 2222 adreno@100.94.181.78").split(" ");
 const TRACE_URLS = ["https://1.1.1.1/cdn-cgi/trace", "https://www.cloudflare.com/cdn-cgi/trace"];
 
-/** Account Settings Read, Workers Scripts Write. */
-const ACCOUNT_PERMISSIONS = ["c1fde68c7bcc44588cbb6ddbc16d6480", "e086da7e2179491d91ee5f35b3ca210a"];
+/** Account Settings Read, Workers Scripts Write, D1 Read, D1 Metadata Read, D1 Write (ofl-waitlist migrations). */
+const ACCOUNT_PERMISSIONS = [
+  "c1fde68c7bcc44588cbb6ddbc16d6480",
+  "e086da7e2179491d91ee5f35b3ca210a",
+  "192192df92ee43ac90f2aeeffce67e35",
+  "5b4da8a35efa4fe8be684070183cdb32",
+  "09b2857d1c31407795e75e3fed8617a1",
+];
 /** Zone Read, Workers Routes Write, DNS Write (the apex and www custom domains). */
 const ZONE_PERMISSIONS = ["c8fed203ed3043cba015a93ad1616f1f", "28f4b596e7d643029c524985477ae49a", "4755a26eedb94da69e1066d98aa820be"];
 

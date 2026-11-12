@@ -58,6 +58,13 @@ const bm = await sharp(src("banner-hex-3x1.png")).metadata();
 const btop = Math.round(bm.height! * 0.55);
 await emit("horizon-d", sharp(src("banner-hex-3x1.png")).extract({ left: 0, top: btop, width: bm.width!, height: bm.height! - btop }).resize({ width: 2048 }));
 
+// Brad's stack diagram, linked from the home page "The stack" section (AVIF + WebP only).
+const diagram = sharp(src("stack-diagram.png")).resize({ width: 1800, withoutEnlargement: true });
+await Promise.all([
+  diagram.clone().avif({ quality: 60, effort: 6 }).toFile(join(art, "stack-diagram.avif")),
+  diagram.clone().webp({ quality: 80, effort: 6 }).toFile(join(art, "stack-diagram.webp")),
+]);
+
 // OG 1200x630: full 3:1 banner on its own black field.
 const banner = await sharp(src("banner-arc-3x1.png")).resize({ width: 1200 }).png().toBuffer();
 const og = await sharp({ create: { width: 1200, height: 630, channels: 3, background: "#000" } })
