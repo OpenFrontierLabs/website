@@ -2,16 +2,16 @@
   "entries": [
     {
       "@context": "https://agenticresourcediscovery.org/context/v1",
-      "identifier": "urn:air:openfrontier-labs.com:docs:llms",
-      "displayName": "Open Frontier Labs guide for agents",
-      "type": "text/markdown",
-      "url": "https://openfrontier-labs.com/llms.txt",
-      "description": "What Open Frontier Labs is, what runs today (CPU smoke tests and the Run 0 launcher) and what is planned, with links to the site, the openfrontier repository and its docs. No agent tools or APIs are offered yet.",
+      "identifier": "urn:air:openfrontier-labs.com:skills:open-frontier-labs",
+      "displayName": "Contributing to Open Frontier Labs",
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "url": "https://openfrontier-labs.com/.well-known/skills/open-frontier-labs/SKILL.md",
+      "description": "Agent skill: check a machine with make doctor and the CPU smoke tests, find good first issues by area, and point a person to sign-up. States plainly that nothing has been trained yet. No agent tools or APIs are offered.",
       "tags": ["open-source", "open-weights", "distributed-training", "community-compute"],
       "representativeQueries": [
-        "what is Open Frontier Labs and has it trained a model yet",
         "how do I contribute GPU compute to an open community training run",
-        "where are the docs for Open Frontier Labs Run 0"
+        "how do I check my machine for Open Frontier Labs Run 0",
+        "find a good first issue in Open Frontier Labs"
       ]
     }
   ]
