@@ -72,7 +72,7 @@
 </picture>
 <p class="dash-eyebrow">The open frontier</p>
 <h1 id="dash-h">Open infrastructure for collective frontier intelligence.</h1>
-<p>Contribute compute, train in the open and share every checkpoint. This dashboard shows the network as it really is: Run 0 is forming, and nothing has been trained yet.</p>
+<p>Contribute compute, train in the open and share every checkpoint. This dashboard shows the network as it really is. Run 0, the first full-size run, has not started; a swarm proof of concept has already trained a small model across real nodes, live below.</p>
 <div class="dash-ctas">
 <a class="btn btn-primary" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md" rel="noopener"><svg class="size-4" aria-hidden="true"><use href="#i-play"/></svg>Run Run 0 yourself</a>
 <a class="btn" href="/manifesto"><svg class="size-4" aria-hidden="true"><use href="#i-doc"/></svg>Read the manifesto</a>
@@ -81,12 +81,12 @@
 
 <ul class="dash-stats" aria-label="Network at a glance">
 <li><svg aria-hidden="true"><use href="#i-people"/></svg><div><b>%GH_CONTRIBUTORS%</b><span>Contributors on GitHub</span></div></li>
-<li><svg aria-hidden="true"><use href="#i-gpu"/></svg><div><b>0</b><span>GPUs in network</span></div><small>none joined yet</small></li>
-<li><svg aria-hidden="true"><use href="#i-bolt"/></svg><div><b>0</b><span>Training runs</span></div><small>Run 0 forming</small></li>
+<li data-swarm="nodes"><svg aria-hidden="true"><use href="#i-gpu"/></svg><div><b>0</b><span>Nodes online</span></div><small>none joined yet</small></li>
+<li data-swarm="runs"><svg aria-hidden="true"><use href="#i-bolt"/></svg><div><b>0</b><span>Training runs</span></div><small>none reported yet</small></li>
 <li><svg aria-hidden="true"><use href="#i-weights"/></svg><div><b>0</b><span>Open models</span></div><small>none released yet</small></li>
 </ul>
 
-<section id="run" class="dcard dcard-run" aria-labelledby="run-h">
+<section id="run" data-swarm="run" class="dcard dcard-run" aria-labelledby="run-h">
 <header><h2 id="run-h">Active training run</h2><span class="dchip"><i aria-hidden="true"></i>Forming</span><a class="dlink" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md" rel="noopener">Details <svg aria-hidden="true"><use href="#i-arr"/></svg></a></header>
 <div class="run-body">
 <div class="run-stack" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -100,7 +100,7 @@
 </div>
 </section>
 
-<section class="dcard dcard-mine" aria-labelledby="mine-h">
+<section data-swarm="mine" class="dcard dcard-mine" aria-labelledby="mine-h">
 <header><h2 id="mine-h">Your contribution</h2><a class="dlink" href="/join">Sign up <svg aria-hidden="true"><use href="#i-arr"/></svg></a></header>
 <p class="mine-val"><b>0</b> GPU·h</p>
 <p class="mine-note">Nodes are counted from Run 0 on, by GitHub handle, in the public compute ledger.</p>
@@ -119,9 +119,9 @@
 <div class="map-body">
 <div class="map-art">
 <!--#partial world-dots-->
-<p class="map-note">No node has joined yet. The first lights appear when Run 0 opens.</p>
+<p class="map-note" data-swarm="mapnote">No node has joined yet. The first lights appear when Run 0 opens.</p>
 </div>
-<ul class="map-stats">
+<ul class="map-stats" data-swarm="map">
 <li><svg aria-hidden="true"><use href="#i-pin"/></svg><div><b>0</b><span>Regions</span></div></li>
 <li><svg aria-hidden="true"><use href="#i-globe"/></svg><div><b>0</b><span>Countries</span></div></li>
 <li><svg aria-hidden="true"><use href="#i-mesh"/></svg><div><b>0</b><span>Nodes online</span></div></li>
@@ -129,7 +129,7 @@
 </div>
 </section>
 
-<section class="dcard dcard-util" aria-labelledby="util-h">
+<section data-swarm="util" class="dcard dcard-util" aria-labelledby="util-h">
 <header><h2 id="util-h">Network utilization</h2><span class="dchip dchip-quiet">Run 0: forming</span></header>
 <div class="util-body">
 <div class="donut" role="img" aria-label="0% utilization: no GPUs in the network yet"><b>0%</b><span>No GPUs yet</span></div>
@@ -152,7 +152,7 @@
 <a href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/docs" rel="noopener"><svg aria-hidden="true"><use href="#i-book"/></svg><span><b>Read the design</b><small>Phases, Run 0, joining a node</small></span></a>
 </section>
 
-<p class="dash-foot">Every number on this page is real: GitHub data is read when the site is built, and everything else is zero until Run 0 starts. <a href="/">openfrontier-labs.com</a></p>
+<p class="dash-foot">Every number on this page is real: GitHub data is read when the site is built, and the swarm figures are read live from what the coordinator reports. <a href="/">openfrontier-labs.com</a></p>
 </main>
 </div>
 </div>

@@ -1,6 +1,7 @@
 {
   "unversioned_paths": [
     "/",
+    "/dashboard",
     "/join",
     "/auth/github",
     "/auth/github/callback",

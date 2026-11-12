@@ -1,8 +1,6 @@
 // Server-rendered HTML shell for /join, the workspace (/console) and the Operator Console. No scripts.
 import { ASSET } from "./assets.gen";
-
-export const esc = (s: unknown) =>
-  String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+import { esc } from "./esc";
 
 const CSP = [
   "default-src 'none'",

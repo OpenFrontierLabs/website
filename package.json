@@ -8,7 +8,7 @@
     "assets": "bun scripts/assets.ts",
     "typecheck": "OFL_GITHUB_FIXTURE=tests/fixtures/github.json bun scripts/build.ts && tsc --noEmit && tsc --noEmit -p worker",
     "lint": "oxlint scripts tests worker",
-    "test": "bun test tests/site.test.ts tests/app.test.ts",
+    "test": "bun test tests/site.test.ts tests/app.test.ts tests/swarm.test.ts",
     "check": "bun run typecheck && bun run lint && bun run test",
     "release": "bun run build && bun scripts/with-cf-deploy-token.ts -- sh -c 'wrangler d1 migrations apply ofl-waitlist --remote && wrangler deploy'",
     "migrate": "wrangler d1 migrations apply ofl-waitlist --local"

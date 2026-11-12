@@ -1,6 +1,7 @@
 // Operator Console (/admin): Review Queue (the waitlist), Audit, and planned tabs.
 import { STATUSES, parseAnswers, type AuditRow, type Filters, type Status, type UserRow } from "./db";
-import { empty, esc, page, tabs, type Viewer } from "./html";
+import { esc } from "./esc";
+import { empty, page, tabs, type Viewer } from "./html";
 import { answersList } from "./member";
 import { CONTRIBUTIONS, HARDWARE, type Answers } from "./questionnaire";
 

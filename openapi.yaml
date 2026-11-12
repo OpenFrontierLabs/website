@@ -14,6 +14,35 @@ paths:
       summary: Home page (static asset) with the live waitlist count
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
+  /dashboard:
+    get:
+      summary: Network dashboard (static asset). The swarm blocks (nodes online, runs, devices by type, latest run with its validation-loss chart, participants and weights hash) are filled from D1 on each view; without swarm data the static zeros stand.
+      responses:
+        "200": { description: HTML page, content: { text/html: {} } }
+  /v1/swarm:
+    get:
+      summary: Public swarm summary as JSON; nodes online (heartbeat within the last online_window_seconds), registered nodes, devices by type, run, round and compute totals, and the latest run with its rounds
+      responses:
+        "200":
+          description: Summary
+          headers: { Cache-Control: { schema: { type: string }, description: "public, max-age=5" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SwarmSummary" }
+  /v1/swarm/ingest:
+    post:
+      summary: Coordinator report. Idempotent upserts of nodes, one run and up to 10 rounds; a heartbeat is a report with only nodes. Same-origin checks do not apply; the bearer token does.
+      security: [{ swarmIngest: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SwarmReport" }
+      responses:
+        "200": { description: Applied, content: { application/json: { schema: { type: object, properties: { ok: { const: true } } } } } }
+        "400": { description: Malformed report; the body names the field, content: { application/json: {} } }
+        "401": { description: Missing or wrong bearer token, content: { application/json: {} } }
+        "503": { description: SWARM_INGEST_TOKEN is not set on the Worker, content: { application/json: {} } }
   /join:
     get:
       summary: Sign-up page with Continue with GitHub (or a not-yet-open note while the OAuth App is unset); signed in, the questionnaire or Overview
@@ -152,3 +181,78 @@ paths:
       summary: Clear the session
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
+components:
+  securitySchemes:
+    swarmIngest: { type: http, scheme: bearer, description: "Worker secret SWARM_INGEST_TOKEN" }
+  schemas:
+    SwarmNodeReport:
+      type: object
+      required: [id, hostname, device, gpu, memory_gib, torch]
+      properties:
+        id: { type: string, description: "hostname-device, e.g. adreno-legion-cuda" }
+        github: { type: string, description: "GitHub login the node is attributed to; a report without it keeps the stored one" }
+        hostname: { type: string }
+        device: { type: string, description: "cuda, mps or cpu" }
+        gpu: { type: string }
+        memory_gib: { type: number }
+        torch: { type: string }
+        first_seen: { type: integer, description: "Unix ms; default now; the earliest value is kept" }
+        last_heartbeat: { type: integer, description: "Unix ms; default now; never moves backwards" }
+    SwarmRunReport:
+      type: object
+      required: [id, model, params, rounds, status]
+      properties:
+        id: { type: string }
+        model: { type: string }
+        params: { type: integer }
+        rounds: { type: integer, description: "Rounds planned" }
+        status: { enum: [waiting, training, done] }
+        started_at: { type: integer }
+        ended_at: { type: integer }
+        weights_hash: { type: string }
+        git_sha: { type: string }
+        initial_val_loss: { type: number }
+        wall_seconds: { type: number }
+        nodes: { type: array, maxItems: 16, items: { type: string }, description: "Ids of the participating nodes" }
+    SwarmRoundReport:
+      type: object
+      required: [run_id, round, val_loss, hashes_agree, elapsed, nodes]
+      properties:
+        run_id: { type: string }
+        round: { type: integer }
+        val_loss: { type: number }
+        hashes_agree: { type: boolean }
+        elapsed: { type: number }
+        at: { type: integer, description: "Unix ms; default now" }
+        nodes:
+          type: array
+          maxItems: 16
+          items:
+            type: object
+            required: [node_id, train_loss, seconds]
+            properties: { node_id: { type: string }, train_loss: { type: number }, seconds: { type: number } }
+    SwarmReport:
+      type: object
+      properties:
+        nodes: { type: array, maxItems: 16, items: { $ref: "#/components/schemas/SwarmNodeReport" } }
+        run: { $ref: "#/components/schemas/SwarmRunReport" }
+        rounds: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/SwarmRoundReport" } }
+    SwarmSummary:
+      type: object
+      required: [generated_at, online_window_seconds, totals, devices, nodes, latest_run]
+      properties:
+        generated_at: { type: integer }
+        online_window_seconds: { type: integer }
+        totals:
+          type: object
+          properties: { nodes_online: { type: integer }, nodes_registered: { type: integer }, runs: { type: integer }, rounds: { type: integer }, compute_seconds: { type: number } }
+        devices:
+          type: array
+          items: { type: object, properties: { device: { type: string }, registered: { type: integer }, online: { type: integer } } }
+        nodes:
+          type: array
+          description: Each node with online, compute_seconds and rounds
+          items: { type: object }
+        latest_run:
+          type: [object, "null"]
+          description: The run record plus state (training with nobody online reads stalled), rounds_done, hashes_agree_all, participants and log (per round val_loss, hashes_agree, elapsed, at and per-node train_loss and seconds)
