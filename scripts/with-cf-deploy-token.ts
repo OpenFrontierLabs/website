@@ -35,19 +35,18 @@ function broker(args: string[], input?: string): string {
   return result.stdout;
 }
 
+// Probe each address family explicitly: a token locked to only the family fetch happened to use is
+// rejected when wrangler connects over the other one on a dual-stack host (fudopro #1968).
 async function egressAddresses(): Promise<string[]> {
-  const found = await Promise.all(
-    TRACE_URLS.map(async (url) => {
-      try {
-        const ip = /^ip=(.+)$/mu.exec(await (await fetch(url, { signal: AbortSignal.timeout(5000) })).text())?.[1]?.trim();
-        if (!ip) return null;
-        return ip.includes(":") ? `${ip}/128` : `${ip}/32`;
-      } catch {
-        return null;
-      }
+  const probes = TRACE_URLS.flatMap((url) =>
+    (["-4", "-6"] as const).map(async (family) => {
+      const out = await Bun.$`curl -s ${family} --max-time 5 ${url}`.nothrow().quiet().text();
+      const ip = /^ip=(.+)$/mu.exec(out)?.[1]?.trim();
+      if (!ip) return null;
+      return ip.includes(":") ? `${ip}/128` : `${ip}/32`;
     }),
   );
-  const addresses = [...new Set(found.filter((value): value is string => value !== null))];
+  const addresses = [...new Set((await Promise.all(probes)).filter((value): value is string => value !== null))];
   if (addresses.length === 0) throw new Error("could not determine this host's egress address");
   return addresses;
 }
@@ -59,6 +58,7 @@ if (command.length === 0) {
 }
 
 const root = "com.cloudflare.api";
+const requestIps = await egressAddresses();
 const minted = JSON.parse(
   broker(
     ["mint"],
@@ -68,14 +68,14 @@ const minted = JSON.parse(
         { effect: "allow", resources: { [`${root}.account.${ACCOUNT_ID}`]: "*" }, permission_groups: ACCOUNT_PERMISSIONS.map((id) => ({ id })) },
         { effect: "allow", resources: { [`${root}.account.zone.${ZONE_ID}`]: "*" }, permission_groups: ZONE_PERMISSIONS.map((id) => ({ id })) },
       ],
-      requestIps: await egressAddresses(),
+      requestIps,
       ttlSeconds: TOKEN_TTL_SECONDS,
     }),
   ),
 ) as { id?: string; value?: string; expiresOn?: string };
 if (!minted.id || !minted.value) throw new Error("cf-token-broker returned no token id or value");
 const { id, value } = minted;
-console.error(`cf deploy token ${id} minted (expires ${minted.expiresOn ?? "?"})`);
+console.error(`cf deploy token ${id} minted for ${requestIps.length} egress address(es), IPv4 and IPv6 as present (expires ${minted.expiresOn ?? "?"})`);
 
 let code = 1;
 try {
