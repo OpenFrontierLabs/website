@@ -55,6 +55,17 @@ describe("dist", () => {
       expect(words(html.slice(start, html.indexOf("</div>", start)))).toBe(body);
     }
     expect(read("sitemap.xml")).toContain("https://openfrontier-labs.com/manifesto");
+    expect(index.match(/href="\/manifesto"/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(manifestoPage).toContain('<link rel="canonical" href="https://openfrontier-labs.com/manifesto">');
+  });
+
+  test("mobile menu is CSS-only and every menu link leaves #menu", () => {
+    for (const html of [index, manifestoPage]) {
+      const menu = /<nav id="menu"[^]*?<\/nav>/.exec(html)?.[0] ?? "";
+      expect(menu).not.toBe("");
+      expect(html).not.toContain("<details");
+      for (const m of menu.matchAll(/href="([^"]+)"/g)) expect(m[1]).not.toBe("#menu");
+    }
   });
 
   test("no link targets a .html path (html_handling would 307 it)", () => {

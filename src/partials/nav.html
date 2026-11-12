@@ -14,9 +14,12 @@
 </nav>
 <div class="flex items-center gap-3">
 <a class="btn btn-primary btn-sm hidden sm:inline-flex" href="/#join"><span>Join the Network</span><svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
-<details class="menu lg:hidden">
-<summary aria-label="Menu"><span></span></summary>
-<div class="menu-panel">
+<a class="menu-btn lg:hidden" href="#menu" aria-label="Open menu" aria-controls="menu"><span></span></a>
+</div>
+</div>
+</header>
+<div class="menu lg:hidden">
+<nav id="menu" class="menu-panel" aria-label="Menu">
 <a href="/#mission">Mission</a>
 <a href="/manifesto">Manifesto</a>
 <a href="/#platform">Platform</a>
@@ -25,8 +28,7 @@
 <a href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/docs" rel="noopener">Docs</a>
 <a href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a>
 <a href="/#join" class="join-link sm:hidden">Join the Network</a>
+</nav>
+<a class="menu-btn menu-close" href="#menu-closed" aria-label="Close menu"><span></span></a>
+<span id="menu-closed" class="menu-anchor"></span>
 </div>
-</details>
-</div>
-</div>
-</header>
