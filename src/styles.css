@@ -1517,7 +1517,7 @@
     text-align: center;
   }
 
-  /* app: /join, Member Console, Operator Console */
+  /* app: /join, workspace Settings form, Operator Console */
   .app-main {
     display: grid;
     gap: 1.5rem;

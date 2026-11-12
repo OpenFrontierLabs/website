@@ -35,31 +35,31 @@ paths:
         "503": { description: GitHub sign-in not configured, content: { text/html: {} } }
   /console:
     get:
-      summary: Member Console: Overview (waitlist status and position, the Discord invite and starter issues matched to the answers)
+      summary: "Workspace: Overview (verified compute, declared nodes, Run 0 assignment, waitlist place, own status history, starter issues matched to the answers)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
   /console/nodes:
     get:
-      summary: Member Console: My Nodes (planned)
+      summary: "Workspace: Compute Nodes (declared hardware; ?device=<kind> selects one)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
   /console/contributions:
     get:
-      summary: Member Console: Contributions (planned)
+      summary: "Workspace: Contributions (compute history, declared hardware mix, signed receipts)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
   /console/runs:
     get:
-      summary: Member Console: Runs (planned)
+      summary: "Workspace: Training Runs (program phases, Run 0 readiness, all runs)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
-  /console/teams:
+  /console/models:
     get:
-      summary: Member Console: Teams (planned)
+      summary: "Workspace: Model Registry (?tab=datasets lists the pinned dataset manifests)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }
@@ -128,7 +128,7 @@ paths:
         "422": { description: Validation errors, form re-rendered, content: { text/html: {} } }
   /console/profile:
     get:
-      summary: Member Console: Profile / Settings (answers and edit form)
+      summary: "Workspace: Settings (answers and edit form)"
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
         "401": { description: No session; join page, content: { text/html: {} } }

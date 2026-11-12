@@ -1,27 +1,11 @@
-// /join, the questionnaire form and the Member Console tabs.
-import type { Status, UserRow } from "./db";
-import { empty, esc, page, tabs, type Viewer } from "./html";
+// /join and the questionnaire form (first time here, and in workspace Settings).
+import type { UserRow } from "./db";
+import { esc, page, type Viewer } from "./html";
 import { CONTRIBUTIONS, EXPERIENCE, HARDWARE, type Answers } from "./questionnaire";
-import { DISCORD_URL, pathsFor } from "./starter";
-
-export const MEMBER_TABS = [
-  { href: "/console", label: "Overview" },
-  { href: "/console/nodes", label: "My Nodes" },
-  { href: "/console/contributions", label: "Contributions" },
-  { href: "/console/runs", label: "Runs" },
-  { href: "/console/teams", label: "Teams" },
-  { href: "/console/profile", label: "Profile / Settings" },
-];
+import { DISCORD_URL } from "./starter";
 
 const discordIcon = (cls: string) =>
   `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4a20 20 0 0 0-4.9-1.6l-.7 1.3a18 18 0 0 0-5.4 0L8.6 3a20 20 0 0 0-5 1.5q-4.4 7-3.5 13.7a20 20 0 0 0 6 3h.1q.8-1 1.2-2l-1.9-1V18l.4-.3c4 1.8 8.3 1.8 12.1 0h.1l.4.3v.1l-1.9 1q.5 1 1.2 2a20 20 0 0 0 6-3h.1q.7-7.7-3.5-13.7M8 15.4c-1.2 0-2.1-1.1-2.1-2.5s1-2.4 2.1-2.4 2.2 1 2.2 2.4-1 2.4-2.2 2.4m8 0c-1.2 0-2.2-1.1-2.2-2.5s1-2.4 2.2-2.4 2.2 1 2.1 2.4q-.1 2.3-2.1 2.4"/></svg>`;
-
-export const PLANNED_MEMBER_TABS: Record<string, string> = {
-  "/console/nodes": "Machines you connect through the Open Frontier Node app will show here.",
-  "/console/contributions": "Compute, code, data and evals you contribute will be credited here by name.",
-  "/console/runs": "Training runs you take part in will show here.",
-  "/console/teams": "Teams you join or start will show here.",
-};
 
 export function joinPage(error: string | null, appOrigin: string, signInOpen = true): string {
   return page(
@@ -50,7 +34,7 @@ export const forbiddenPage = (v: Viewer | null, appOrigin: string) =>
   page(
     "Operators only",
     v,
-    `<section class="app-join gcard"><p class="eyebrow">Operator Console</p><h1>Operators only.</h1><p>The Operator Console is for admins of the OpenFrontierLabs GitHub organization.</p>${v ? '<a class="btn" href="/console">Go to your Member Console</a>' : `<a class="btn btn-primary" href="${appOrigin}/auth/github">Sign in with GitHub</a>`}</section>`,
+    `<section class="app-join gcard"><p class="eyebrow">Operator Console</p><h1>Operators only.</h1><p>The Operator Console is for admins of the OpenFrontierLabs GitHub organization.</p>${v ? '<a class="btn" href="/console">Go to your workspace</a>' : `<a class="btn btn-primary" href="${appOrigin}/auth/github">Sign in with GitHub</a>`}</section>`,
   );
 
 const field = (name: string, label: string, control: string, errors: Record<string, string>, hint = "") =>
@@ -111,39 +95,6 @@ export const questionnairePage = (v: Viewer, a: Answers, errors: Record<string, 
 ${questionnaireForm(a, errors, "/join/questionnaire", "Join the waitlist")}`,
   );
 
-function memberShell(v: Viewer, current: string, body: string): string {
-  return page(
-    "Member Console",
-    v,
-    `<header class="app-head"><p class="eyebrow">Member Console</p><h1>Welcome, ${esc(v.login)}.</h1></header>
-${tabs(MEMBER_TABS, current, "Member Console")}
-${body}`,
-  );
-}
-
-const STATUS_COPY: Record<Status, string> = {
-  waitlisted: "You're on the waitlist",
-  invited: "You're invited",
-  active: "You're an active member",
-  rejected: "Your sign-up was not accepted",
-};
-
-/** `thanks` is set on the page shown right after the questionnaire is first submitted. */
-export function overviewPage(v: Viewer, u: UserRow, position: number, answers: Answers, thanks = false): string {
-  const status = u.status === "waitlisted" ? `${STATUS_COPY.waitlisted}, #${position}` : STATUS_COPY[u.status];
-  const paths = pathsFor(answers.contributions)
-    .map((p) => `<li class="gcard tile"><h3>${esc(p.title)}</h3><p>${esc(p.what)}</p><a class="more" href="${esc(p.href)}" rel="noopener">${esc(p.linkText)}</a></li>`)
-    .join("");
-  const matched = answers.contributions.length > 0 ? "Matched to what you said you can contribute." : "You did not pick a contribution yet, so here is every path.";
-  return memberShell(
-    v,
-    "/console",
-    `${thanks ? '<p class="app-ok" role="status">Thank you for joining. Your answers are saved.</p>' : ""}<section class="gcard app-status"><p class="eyebrow">Status</p><h2>${esc(status)}.</h2><p>Signed up ${esc(u.created_at.slice(0, 10))}. We will email you when the first run opens, if you agreed to be contacted.</p><a class="more" href="/console/profile">Your answers and edit form</a></section>
-<section class="gcard"><p class="eyebrow">Community</p><h2 class="app-h2">Join the Discord.</h2><p>Talk to the other contributors, compute providers and researchers in the open Discord server. Say hello there and ask for an issue to be assigned to you.</p><a class="btn" href="${DISCORD_URL}" rel="noopener">${discordIcon("size-5")}<span>Join the Discord</span></a></section>
-<section class="gcard"><p class="eyebrow">Start here</p><h2 class="app-h2">Starter issues for you.</h2><p class="muted">${matched} Issue links are live GitHub searches of open good first issues.</p><ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">${paths}</ul></section>`,
-  );
-}
-
 export function answersList(a: Answers): string {
   const hw = Object.entries(a.hardware).map(([k, n]) => `${HARDWARE[k as keyof typeof HARDWARE]}: ${n}`);
   const rows: [string, string][] = [
@@ -162,14 +113,3 @@ export function answersList(a: Answers): string {
   ];
   return `<dl class="answers">${rows.map(([k, val]) => `<dt>${esc(k)}</dt><dd>${val ? esc(val) : '<span class="muted">Not given</span>'}</dd>`).join("")}</dl>`;
 }
-
-export const profilePage = (v: Viewer, a: Answers, errors: Record<string, string>, saved: boolean) =>
-  memberShell(
-    v,
-    "/console/profile",
-    `${saved ? '<p class="app-ok" role="status">Saved.</p>' : ""}<section class="gcard"><h2 class="app-h2">Your answers</h2>${answersList(a)}</section>
-<section class="gcard"><h2 class="app-h2">Edit</h2>${questionnaireForm(a, errors, "/console/profile", "Save")}</section>`,
-  );
-
-export const plannedMemberPage = (v: Viewer, current: string) =>
-  memberShell(v, current, empty("Coming with the Node app", PLANNED_MEMBER_TABS[current] ?? ""));

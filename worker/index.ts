@@ -1,10 +1,12 @@
 // Worker for openfrontier-labs.com: static assets plus GitHub sign-up, the waitlist questionnaire,
-// the Member Console (/console) and the Operator Console (/admin). Everything else is assets.
+// the signed-in workspace (/console) and the Operator Console (/admin). Everything else is assets.
 import * as db from "./db";
 import { exchangeCode, fetchProfile, isOperator, SCOPE } from "./github";
 import { html, SECURITY_HEADERS, toGitHub, type Viewer } from "./html";
 import * as member from "./member";
 import * as operator from "./operator";
+import * as pages from "./workspace-pages";
+import type { WorkspaceData } from "./workspace";
 import { validateAnswers, type Answers } from "./questionnaire";
 import { cookies, randomToken, readSession, sign, SESSION_TTL, setCookie, signSession, STATE_TTL, stateMatches } from "./signing";
 
@@ -39,12 +41,16 @@ interface Ctx {
 const viewerOf = (u: db.UserRow): Viewer => ({ login: u.login, avatarUrl: u.avatar_url, isAdmin: u.is_admin === 1 });
 
 /** Where a signed-in person lands: the questionnaire until they have answered it, then the Overview
- * (with a thank-you and matched starter issues right after the questionnaire). */
+ * (with a thank-you right after the questionnaire). */
 async function landing(c: Ctx, user: db.UserRow, setCookies: string[] = [], thanks = false): Promise<Response> {
   const v = viewerOf(user);
   const answers = db.parseAnswers(user);
   if (!answers) return html(member.questionnairePage(v, member.prefill(user), {}), 200, setCookies);
-  return html(member.overviewPage(v, user, await db.waitlistPosition(c.env.DB, user.id), answers, thanks), 200, setCookies);
+  return html(pages.overview(await workspaceData(c, user, answers), thanks), 200, setCookies);
+}
+
+async function workspaceData(c: Ctx, user: db.UserRow, answers: Answers): Promise<WorkspaceData> {
+  return { v: viewerOf(user), user, answers, ...(await db.standing(c.env.DB, user)), now: new Date() };
 }
 
 async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
@@ -115,18 +121,33 @@ async function memberRoutes(c: Ctx, user: db.UserRow): Promise<Response> {
   const answers = db.parseAnswers(user);
   if (pathname === "/join/questionnaire") {
     if (c.req.method === "POST") return saveQuestionnaire(c, user, (e, a) => member.questionnairePage(v, a, e), (saved) => landing(c, saved, [], true));
-    return answers ? html(member.profilePage(v, answers, {}, false)) : landing(c, user);
+    return answers ? html(pages.settings(await workspaceData(c, user, answers), answers, {}, false)) : landing(c, user);
   }
   if (!answers) return landing(c, user);
-  if (pathname === "/console") return html(member.overviewPage(v, user, await db.waitlistPosition(c.env.DB, user.id), answers));
-  if (pathname === "/console/profile") {
-    if (c.req.method === "POST") {
-      return saveQuestionnaire(c, user, (e, a) => member.profilePage(v, a, e, false), async (saved) => html(member.profilePage(v, db.parseAnswers(saved) ?? answers, {}, true)));
-    }
-    return html(member.profilePage(v, answers, {}, false));
+  const d = await workspaceData(c, user, answers);
+  const q = c.url.searchParams;
+  switch (pathname) {
+    case "/console":
+      return html(pages.overview(d));
+    case "/console/nodes":
+      return html(pages.nodes(d, q.get("device")));
+    case "/console/runs":
+      return html(pages.runs(d));
+    case "/console/models":
+      return html(pages.models(d, q.get("tab")));
+    case "/console/contributions":
+      return html(pages.contributions(d));
+    case "/console/profile":
+      if (c.req.method === "POST") {
+        return saveQuestionnaire(c, user, (e, a) => pages.settings(d, a, e, false), async (saved) => {
+          const now = db.parseAnswers(saved) ?? answers;
+          return html(pages.settings({ ...d, user: saved, answers: now }, now, {}, true));
+        });
+      }
+      return html(pages.settings(d, answers, {}, false));
+    default:
+      return text("Not found", 404);
   }
-  if (pathname in member.PLANNED_MEMBER_TABS) return html(member.plannedMemberPage(v, pathname));
-  return text("Not found", 404);
 }
 
 async function operatorRoutes(c: Ctx, user: db.UserRow): Promise<Response> {

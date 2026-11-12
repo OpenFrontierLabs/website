@@ -1,4 +1,4 @@
-// Server-rendered HTML shell for /join, the Member Console and the Operator Console. No scripts.
+// Server-rendered HTML shell for /join, the workspace (/console) and the Operator Console. No scripts.
 import { ASSET } from "./assets.gen";
 
 export const esc = (s: unknown) =>
@@ -7,13 +7,14 @@ export const esc = (s: unknown) =>
 const CSP = [
   "default-src 'none'",
   "img-src 'self' data: https://avatars.githubusercontent.com",
-  // The stylesheet is inlined (one render-blocking request fewer); its hash is the only inline style allowed.
-  `style-src 'self' ${ASSET.cssHash}`,
+  // Stylesheets are inlined (one render-blocking request fewer); their hashes are the only inline styles allowed.
+  `style-src 'self' ${ASSET.cssHash} ${ASSET.wsCssHash}`,
   "font-src 'self'",
   "script-src 'none'",
   "connect-src 'self'",
   "base-uri 'none'",
-  "form-action 'self'",
+  // The workspace search goes to GitHub's repository search.
+  "form-action 'self' https://github.com",
   "frame-ancestors 'none'",
 ].join("; ");
 
@@ -47,7 +48,7 @@ export function tabs(list: Tab[], current: string, label: string): string {
 function account(v: Viewer | null): string {
   if (!v) return "";
   const avatar = v.avatarUrl ? `<img class="app-avatar" src="${esc(v.avatarUrl)}&amp;s=64" width="28" height="28" alt="">` : "";
-  return `<div class="app-account">${v.isAdmin ? '<a class="navlink" href="/admin">Operator Console</a>' : ""}<a class="navlink" href="/console">Member Console</a><span class="app-who">${avatar}${esc(v.login)}</span><form method="post" action="/logout"><button class="btn btn-sm" type="submit">Sign out</button></form></div>`;
+  return `<div class="app-account">${v.isAdmin ? '<a class="navlink" href="/admin">Operator Console</a>' : ""}<a class="navlink" href="/console">Workspace</a><span class="app-who">${avatar}${esc(v.login)}</span><form method="post" action="/logout"><button class="btn btn-sm" type="submit">Sign out</button></form></div>`;
 }
 
 /** A public page (only /join) passes `index`: it is crawlable, described and canonical. Everything else stays noindex. */
@@ -56,9 +57,10 @@ export interface PublicMeta {
   canonical: string;
 }
 
-export function page(title: string, viewer: Viewer | null, body: string, index?: PublicMeta): string {
-  const meta = index
-    ? `<meta name="description" content="${esc(index.description)}">\n<link rel="canonical" href="${esc(index.canonical)}">`
+/** The document around every Worker page. `styles` are inline stylesheets admitted by hash in the CSP. */
+export function documentHtml(title: string, body: string, opts: { index?: PublicMeta; bodyClass?: string; styles?: string[] } = {}): string {
+  const meta = opts.index
+    ? `<meta name="description" content="${esc(opts.index.description)}">\n<link rel="canonical" href="${esc(opts.index.canonical)}">`
     : '<meta name="robots" content="noindex">';
   return `<!doctype html>
 <html lang="en">
@@ -70,18 +72,29 @@ ${meta}
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
-<style>${ASSET.css}</style>
+${(opts.styles ?? [ASSET.css]).map((css) => `<style>${css}</style>`).join("\n")}
 </head>
-<body>
-<header class="nav"><div class="wrap-x flex h-16 items-center justify-between gap-4">
-<a href="/" class="brand"><picture><source srcset="${ASSET.logoAvif}" type="image/avif"><source srcset="${ASSET.logoWebp}" type="image/webp"><img src="${ASSET.logoPng}" width="160" height="74" alt="" class="brand-mark"></picture><span>Open Frontier Labs</span></a>
+<body${opts.bodyClass ? ` class="${opts.bodyClass}"` : ""}>
+${body}
+</body>
+</html>`;
+}
+
+export const brandPicture = (cls: string) =>
+  `<picture><source srcset="${ASSET.logoAvif}" type="image/avif"><source srcset="${ASSET.logoWebp}" type="image/webp"><img src="${ASSET.logoPng}" width="160" height="74" alt="" class="${cls}"></picture>`;
+
+export function page(title: string, viewer: Viewer | null, body: string, index?: PublicMeta): string {
+  return documentHtml(
+    title,
+    `<header class="nav"><div class="wrap-x flex h-16 items-center justify-between gap-4">
+<a href="/" class="brand">${brandPicture("brand-mark")}<span>Open Frontier Labs</span></a>
 ${account(viewer)}
 </div></header>
 <main id="main" class="wrap-x app-main">
 ${body}
-</main>
-</body>
-</html>`;
+</main>`,
+    { index },
+  );
 }
 
 export function html(body: string, status = 200, setCookies: string[] = []): Response {

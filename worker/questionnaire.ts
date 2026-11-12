@@ -132,3 +132,31 @@ export function validateAnswers(form: FormLike): Validation {
   };
   return { answers, errors };
 }
+
+export interface Device {
+  kind: HardwareKind;
+  label: string;
+  count: number;
+}
+
+/** Hardware the person declared at sign-up, largest first. Declared, never connected: there is no Node app yet. */
+export function declaredDevices(a: Answers): Device[] {
+  if (a.noHardware) return [];
+  return (Object.entries(a.hardware) as [HardwareKind, number][])
+    .filter(([, n]) => n > 0)
+    .map(([kind, count]) => ({ kind, label: HARDWARE[kind], count }))
+    .sort((x, y) => y.count - x.count);
+}
+
+export const deviceTotal = (devices: Device[]) => devices.reduce((n, d) => n + d.count, 0);
+
+/** Declared devices by vendor, for the hardware-mix donut. */
+export function vendorMix(devices: Device[]): { label: string; value: number }[] {
+  const of = (...kinds: HardwareKind[]) => devices.filter((d) => kinds.includes(d.kind)).reduce((n, d) => n + d.count, 0);
+  return [
+    { label: "NVIDIA", value: of("nvidia_consumer", "nvidia_datacenter") },
+    { label: "Apple Silicon", value: of("apple") },
+    { label: "AMD", value: of("amd") },
+    { label: "Google TPU", value: of("tpu") },
+  ];
+}

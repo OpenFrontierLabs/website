@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { isOperator } from "../worker/github";
-import { validateAnswers } from "../worker/questionnaire";
+import { declaredDevices, validateAnswers, vendorMix } from "../worker/questionnaire";
 import { readSession, sign, signSession, stateMatches } from "../worker/signing";
 import { DISCORD_URL, issueSearch, PATHS, pathsFor } from "../worker/starter";
 
@@ -106,6 +106,26 @@ describe("questionnaire validator", () => {
   test("None conflicts with counts; consent needs an email", () => {
     const { errors } = validateAnswers(form([["displayName", "Ada"], ["hw_none", "on"], ["hw_tpu", "1"], ["consent", "on"]]));
     expect(Object.keys(errors).sort()).toEqual(["consent", "hardware"]);
+  });
+});
+
+describe("declared hardware in the workspace", () => {
+  const base = validateAnswers({ getAll: () => [], get: (k: string) => (k === "displayName" ? "Ada" : null) }).answers;
+
+  test("lists declared kinds largest first and groups vendors; nothing when None was ticked", () => {
+    const a = { ...base, hardware: { amd: 1, nvidia_consumer: 2, nvidia_datacenter: 1, tpu: 0 } };
+    expect(declaredDevices(a).map((d) => [d.kind, d.count])).toEqual([
+      ["nvidia_consumer", 2],
+      ["amd", 1],
+      ["nvidia_datacenter", 1],
+    ]);
+    expect(vendorMix(declaredDevices(a))).toEqual([
+      { label: "NVIDIA", value: 3 },
+      { label: "Apple Silicon", value: 0 },
+      { label: "AMD", value: 1 },
+      { label: "Google TPU", value: 0 },
+    ]);
+    expect(declaredDevices({ ...a, noHardware: true })).toEqual([]);
   });
 });
 

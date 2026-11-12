@@ -42,15 +42,6 @@ export const getUser = (db: D1Database, id: number) => db.prepare("SELECT * FROM
 export const saveAnswers = (db: D1Database, id: number, answers: Answers) =>
   db.prepare("UPDATE users SET answers = ?, updated_at = ? WHERE id = ?").bind(JSON.stringify(answers), new Date().toISOString(), id).run();
 
-/** 1-based place among people still waiting who finished the questionnaire, by sign-up order. */
-export async function waitlistPosition(db: D1Database, id: number): Promise<number> {
-  const r = await db
-    .prepare("SELECT COUNT(*) AS n FROM users WHERE status = 'waitlisted' AND answers IS NOT NULL AND id <= ?")
-    .bind(id)
-    .first<{ n: number }>();
-  return r?.n ?? 0;
-}
-
 export async function waitlistCount(db: D1Database): Promise<number> {
   const r = await db.prepare("SELECT COUNT(*) AS n FROM users WHERE status = 'waitlisted' AND answers IS NOT NULL").first<{ n: number }>();
   return r?.n ?? 0;
@@ -131,3 +122,14 @@ export interface AuditRow {
 
 export const listAudit = async (db: D1Database) =>
   (await db.prepare("SELECT * FROM audit ORDER BY id DESC LIMIT 500").all<AuditRow>()).results;
+
+/** One round trip for the workspace: waitlist place (0 unless waitlisted), queue length, own status history. */
+export async function standing(db: D1Database, user: UserRow): Promise<{ position: number; waiting: number; events: AuditRow[] }> {
+  const [pos, count, events] = await db.batch<{ n: number } | AuditRow>([
+    db.prepare("SELECT COUNT(*) AS n FROM users WHERE status = 'waitlisted' AND answers IS NOT NULL AND id <= ?").bind(user.id),
+    db.prepare("SELECT COUNT(*) AS n FROM users WHERE status = 'waitlisted' AND answers IS NOT NULL"),
+    db.prepare("SELECT * FROM audit WHERE user_id = ? ORDER BY id DESC LIMIT 8").bind(user.id),
+  ]);
+  const n = (r: D1Result<unknown> | undefined) => (r?.results[0] as { n: number } | undefined)?.n ?? 0;
+  return { position: user.status === "waitlisted" ? n(pos) : 0, waiting: n(count), events: (events?.results ?? []) as AuditRow[] };
+}
