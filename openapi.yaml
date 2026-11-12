@@ -4,7 +4,7 @@ info:
   version: 0.1.0
   description: >-
     Browser routes served by the Worker (server-rendered HTML forms, no JSON API). Session is a
-    signed HttpOnly cookie set by the GitHub OAuth callback; POSTs must carry this site's Origin.
+    signed HttpOnly cookie set by the GitHub OAuth callback; POSTs must be same-origin (Sec-Fetch-Site: same-origin, or this site's Origin when that header is absent).
     Pages, not a programmatic API, so paths are unversioned (declared in api-schema-gate.json).
 servers:
   - url: https://openfrontier-labs.com
