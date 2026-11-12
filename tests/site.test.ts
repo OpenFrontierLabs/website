@@ -36,6 +36,10 @@ describe("dist", () => {
     }
   });
 
+  test("no link targets a .html path (html_handling would 307 it)", () => {
+    expect(all).not.toMatch(/(?:href|src)="[^"]*\.html/);
+  });
+
   test("contact strings present", () => {
     expect(index).toContain("openfrontierlabs@gmail.com");
     expect(index).toContain("https://github.com/OpenFrontierLabs/openfrontier");
