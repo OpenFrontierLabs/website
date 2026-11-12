@@ -1,6 +1,6 @@
 # Open Frontier Labs website
 
-Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open infrastructure for collective frontier intelligence. Static HTML + Tailwind CSS v4 on Cloudflare Workers Static Assets, plus a small Worker (`worker/`) and a D1 database (`ofl-waitlist`, schema in `migrations/`) for GitHub sign-up, the waitlist questionnaire, the Member Console (`/console`) and the Operator Console (`/admin`).
+Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open infrastructure for collective frontier intelligence. Static HTML + Tailwind CSS v4 on Cloudflare Workers Static Assets, plus a small Worker (`worker/`) and a D1 database (`ofl-waitlist`, schema in `migrations/`) for GitHub sign-up, the waitlist questionnaire, the contributor workspace (`/console`) and the Operator Console (`/admin`).
 
 ```
 make setup    # bun install
