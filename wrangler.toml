@@ -1,0 +1,14 @@
+# Open Frontier Labs website. Assets-only Worker: no script, no bindings, no crons.
+name = "openfrontier-labs-website"
+compatibility_date = "2026-11-12"
+workers_dev = false
+
+routes = [
+  { pattern = "openfrontier-labs.com", custom_domain = true },
+  { pattern = "www.openfrontier-labs.com", custom_domain = true },
+]
+
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"
+html_handling = "auto-trailing-slash"
