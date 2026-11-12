@@ -1,0 +1,13 @@
+{
+  "name": "Open Frontier Labs",
+  "short_name": "OFL",
+  "description": "Open infrastructure for collective frontier intelligence.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0B0E0D",
+  "theme_color": "#0B0E0D",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
