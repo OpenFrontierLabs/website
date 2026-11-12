@@ -7,7 +7,10 @@ const build = Bun.spawnSync(["bun", join(import.meta.dir, "../scripts/build.ts")
 if (build.exitCode !== 0) throw new Error("build failed");
 const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
-const all = `${index}\n${read("404.html")}`;
+const manifestoPage = read("manifesto.html");
+const all = `${index}\n${read("404.html")}\n${manifestoPage}`;
+// Workers html_handling serves /manifesto from manifesto.html.
+const served = (p: string) => p === "/" || existsSync(join(dist, p)) || existsSync(join(dist, `${p}.html`));
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
@@ -28,12 +31,31 @@ describe("dist", () => {
     for (const m of index.matchAll(/href="([^"]+)"/g)) {
       const href = m[1]!;
       if (href.startsWith("#")) expect(ids.has(href.slice(1))).toBe(true);
-      else if (href.startsWith("/")) expect(existsSync(join(dist, href.split(/[?#]/)[0]!))).toBe(true);
+      else if (href.startsWith("/")) expect(served(href.split(/[?#]/)[0]!)).toBe(true);
     }
     for (const m of all.matchAll(/(?:src|href)="(\/[^"]*)"/g)) {
       const p = m[1]!.split(/[?#]/)[0]!;
-      expect(p === "/" || existsSync(join(dist, p))).toBe(true);
+      expect(served(p)).toBe(true);
     }
+  });
+
+  test("manifesto ships word for word on the home page and /manifesto, linked from nav and footer", () => {
+    const text = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ");
+    const source = readFileSync(join(import.meta.dir, "../content/manifesto.md"), "utf8");
+    for (const block of source.trim().split(/\n\s*\n/)) {
+      const plain = block.replace(/^# /, "").replaceAll("**", "").replace(/\s+/g, " ");
+      expect(text(index)).toContain(plain);
+      expect(text(manifestoPage)).toContain(plain);
+    }
+    expect(index.match(/href="\/manifesto"/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(manifestoPage).toContain('<link rel="canonical" href="https://openfrontier-labs.com/manifesto">');
+  });
+
+  test("mobile menu is CSS-only and every menu link leaves #menu", () => {
+    const menu = /<nav id="menu"[^]*?<\/nav>/.exec(index)?.[0] ?? "";
+    expect(menu).not.toBe("");
+    expect(index).not.toContain("<details");
+    for (const m of menu.matchAll(/href="([^"]+)"/g)) expect(m[1]).not.toBe("#menu");
   });
 
   test("no link targets a .html path (html_handling would 307 it)", () => {
