@@ -9,12 +9,13 @@ const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
 const manifestoPage = read("manifesto.html");
 const dashboard = read("dashboard.html");
-const pages = { "index.html": index, "manifesto.html": manifestoPage, "dashboard.html": dashboard };
-const all = `${index}\n${manifestoPage}\n${dashboard}\n${read("404.html")}`;
+const contributorsPage = read("contributors.html");
+const pages = { "index.html": index, "manifesto.html": manifestoPage, "dashboard.html": dashboard, "contributors.html": contributorsPage };
+const all = `${index}\n${manifestoPage}\n${dashboard}\n${contributorsPage}\n${read("404.html")}`;
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
-    for (const f of ["index.html", "manifesto.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon-32.png", "favicon.ico", "og.png", "site.webmanifest"]) {
+    for (const f of ["index.html", "manifesto.html", "contributors.html", "404.html", "_headers", "robots.txt", "sitemap.xml", "favicon-32.png", "favicon.ico", "og.png", "site.webmanifest"]) {
       expect(existsSync(join(dist, f))).toBe(true);
     }
     expect(existsSync(join(dist, "_redirects"))).toBe(false);
@@ -132,6 +133,23 @@ describe("dist", () => {
     expect(h.match(/form-action [^;]+/g)).toEqual(["form-action 'none'", "form-action https://github.com"]);
     expect(h).toMatch(/\/dashboard\n {2}! Content-Security-Policy\n {2}Content-Security-Policy: [^\n]*form-action https:\/\/github\.com/);
     expect(dashboard).toContain('<form class="dash-search" action="https://github.com/OpenFrontierLabs/openfrontier/search" method="get"');
+  });
+
+  test("contributors: real GitHub contributors, real ledger entries only, CREDITS.md rendered", () => {
+    expect(contributorsPage).not.toMatch(/%[A-Z_]+%/);
+    const people = [...contributorsPage.matchAll(/<li><a href="https:\/\/github\.com\/([\w-]+)" rel="noopener"><img src="(\/assets\/avatar-\w+\.\w+)"/g)];
+    expect(people.length).toBeGreaterThan(0);
+    for (const m of people) expect(existsSync(join(dist, m[2]!))).toBe(true);
+    // The upstream example ledger is fake and must never pass for donors.
+    expect(contributorsPage).not.toContain("example-handle");
+    expect(contributorsPage).not.toContain("Example Donor");
+    expect(contributorsPage).not.toMatch(/\$\s?\d|USD/);
+    const board = contributorsPage.slice(contributorsPage.indexOf('id="compute"'), contributorsPage.indexOf('id="credits"'));
+    expect(board.includes("<table") !== board.includes("No compute has been donated yet")).toBe(true);
+    expect(contributorsPage).toContain('<div class="credits-body">');
+    expect(contributorsPage).not.toMatch(/href="(?!https:|\/|#|mailto:)/);
+    expect(read("sitemap.xml")).toContain("https://openfrontier-labs.com/contributors");
+    for (const html of [index, manifestoPage, dashboard]) expect(html).toContain('href="/contributors"');
   });
 
   test("og.png is 1200x630", () => {

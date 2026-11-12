@@ -42,10 +42,10 @@ const withArt = (html: string) =>
 // build time, and the build fails rather than publish a made-up 0 or an empty feed when GitHub is
 // unreachable or rate-limited. GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
 const token = process.env.GITHUB_TOKEN;
-async function github(path: string): Promise<Response> {
+async function github(path: string, accept = "application/vnd.github+json"): Promise<Response> {
   const res = await fetch(`https://api.github.com/${path}`, {
     headers: {
-      accept: "application/vnd.github+json",
+      accept,
       "user-agent": "ofl-website-build",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
@@ -57,6 +57,9 @@ async function github(path: string): Promise<Response> {
 const contributorsRes = await github("repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1");
 const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
 
+// The organisation's repositories: the activity feed and the contributors page read all three.
+const REPOS = ["openfrontier", "website", ".github"];
+
 // Recent activity: the latest merged pull requests across the organisation's repositories.
 interface Pull {
   number: number;
@@ -67,7 +70,7 @@ interface Pull {
 const escapeHtml = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const merged = (
   await Promise.all(
-    ["openfrontier", "website", ".github"].map(async (repo) => {
+    REPOS.map(async (repo) => {
       const pulls = (await (await github(`repos/OpenFrontierLabs/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`)).json()) as Pull[];
       return pulls.filter((p) => p.merged_at !== null).map((p) => ({ ...p, repo, mergedAt: p.merged_at! }));
     }),
@@ -85,9 +88,103 @@ const activity = merged
   })
   .join("\n");
 
+// Contributors page (/contributors): everyone with commits in the organisation's repositories, the compute
+// ledger and CREDITS.md, all read from GitHub at build time. Avatars are copied into dist so the page stays
+// on our own origin under the CSP.
+interface GitHubContributor {
+  login: string;
+  type: string;
+  avatar_url: string;
+  contributions: number;
+}
+async function allPages<T>(path: string): Promise<T[]> {
+  const out: T[] = [];
+  for (let page = 1; ; page++) {
+    const res = await github(`${path}?per_page=100&page=${page}`);
+    if (res.status === 204) return out; // an empty repository has no contributors
+    out.push(...((await res.json()) as T[]));
+    if (!/rel="next"/.test(res.headers.get("link") ?? "")) return out;
+  }
+}
+const people = new Map<string, { login: string; avatarUrl: string; commits: number }>();
+for (const list of await Promise.all(REPOS.map((repo) => allPages<GitHubContributor>(`repos/OpenFrontierLabs/${repo}/contributors`)))) {
+  for (const c of list) {
+    if (c.type !== "User") continue; // bots are not credited
+    const person = people.get(c.login) ?? { login: c.login, avatarUrl: c.avatar_url, commits: 0 };
+    person.commits += c.contributions;
+    people.set(c.login, person);
+  }
+}
+if (people.size === 0) throw new Error("GitHub returned no contributors for the contributors page");
+const AVATAR_TYPES: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/gif": "gif", "image/webp": "webp" };
+async function avatar(url: string): Promise<string> {
+  const res = await fetch(`${url}${url.includes("?") ? "&" : "?"}s=96`, { signal: AbortSignal.timeout(8000) });
+  const ext = AVATAR_TYPES[res.headers.get("content-type") ?? ""];
+  if (!res.ok || !ext) throw new Error(`avatar ${url}: HTTP ${res.status} ${res.headers.get("content-type")}`);
+  const data = new Uint8Array(await res.arrayBuffer());
+  const name = `avatar-${hash(data)}.${ext}`;
+  await writeFile(join(dist, "assets", name), data);
+  return `/assets/${name}`;
+}
+const contributors = (
+  await Promise.all(
+    [...people.values()]
+      .sort((a, b) => b.commits - a.commits || a.login.localeCompare(b.login))
+      .map(async (p) => {
+        const commits = `${p.commits.toLocaleString("en-US")} commit${p.commits === 1 ? "" : "s"}`;
+        return `<li><a href="https://github.com/${escapeHtml(p.login)}" rel="noopener"><img src="${await avatar(p.avatarUrl)}" width="48" height="48" alt="" loading="lazy" decoding="async"><span><b>${escapeHtml(p.login)}</b><small>${commits}</small></span></a></li>`;
+      }),
+  )
+).join("\n");
+
+// Compute ledger: real files only. Examples (EXAMPLE in the name, "example": true inside) are never rendered.
+interface LedgerFile {
+  example?: boolean;
+  run: string;
+  islands?: { id: string; name: string; donor: string }[];
+  nodes: { github_handle: string; gpu_hours: number }[];
+}
+const HANDLE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+const ledgerDir = (await (await github("repos/OpenFrontierLabs/openfrontier/contents/ledger")).json()) as { name: string; path: string; type: string }[];
+const ledgerFiles = ledgerDir.filter((f) => f.type === "file" && f.name.endsWith(".json") && f.name !== "schema.json" && !f.name.includes("EXAMPLE"));
+const ledgers = (
+  await Promise.all(
+    ledgerFiles.map(async (f) => ({ file: f, ledger: (await (await github(`repos/OpenFrontierLabs/openfrontier/contents/${f.path}`, "application/vnd.github.raw+json")).json()) as LedgerFile })),
+  )
+).filter(({ ledger }) => ledger.example !== true);
+const donors = new Map<string, { gpuHours: number; runs: Set<string> }>();
+const islands = new Map<string, string>();
+for (const { file, ledger } of ledgers) {
+  for (const node of ledger.nodes) {
+    if (!HANDLE.test(node.github_handle) || !Number.isFinite(node.gpu_hours) || node.gpu_hours < 0) throw new Error(`${file.path}: invalid node ${JSON.stringify(node)}`);
+    const donor = donors.get(node.github_handle) ?? { gpuHours: 0, runs: new Set<string>() };
+    donor.gpuHours += node.gpu_hours;
+    donor.runs.add(ledger.run);
+    donors.set(node.github_handle, donor);
+  }
+  for (const island of ledger.islands ?? []) islands.set(`${ledger.run}/${island.id}`, `<li><b>${escapeHtml(island.name)}</b>, donated by ${escapeHtml(island.donor)} (${escapeHtml(ledger.run)})</li>`);
+}
+const ledgerUrl = "https://github.com/OpenFrontierLabs/openfrontier/tree/main/ledger";
+const leaderboard =
+  donors.size === 0
+    ? `<div class="gcard people-empty"><span class="tag">Planned</span><p>No compute has been donated yet: nothing has been trained, so the <a href="${ledgerUrl}" rel="noopener">compute ledger</a> holds no real entries. When Run 0 produces its first ledger file, every node's GitHub handle and GPU-hours show here, ranked.</p></div>`
+    : `<div class="app-table-wrap"><table class="app-table"><thead><tr><th>#</th><th>GitHub handle</th><th>GPU-hours</th><th>Runs</th></tr></thead><tbody>${[...donors]
+        .sort(([ha, a], [hb, b]) => b.gpuHours - a.gpuHours || ha.localeCompare(hb))
+        .map(([handle, d], i) => `<tr><td>${i + 1}</td><td><a href="https://github.com/${handle}" rel="noopener">${handle}</a></td><td>${d.gpuHours.toLocaleString("en-US", { maximumFractionDigits: 1 })}</td><td>${escapeHtml([...d.runs].sort().join(", "))}</td></tr>`)
+        .join("")}</tbody></table></div>${islands.size ? `<h3>Donated clusters (islands)</h3><ul class="people-islands">${[...islands.values()].join("")}</ul>` : ""}<p class="muted">From ${ledgers.map(({ file }) => `<a href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/${escapeHtml(file.path)}" rel="noopener">${escapeHtml(file.name)}</a>`).join(", ")}.</p>`;
+
+// CREDITS.md, word for word; its relative links point into the openfrontier repository.
+const creditsHtml = Bun.markdown.html(await (await github("repos/OpenFrontierLabs/openfrontier/contents/CREDITS.md", "application/vnd.github.raw+json")).text());
+const credits = creditsHtml
+  .replace(/<h1>.+?<\/h1>\n?/, "")
+  .replace(/href="(?!https:|#|mailto:)([^"]+)"/g, 'href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/$1" rel="noopener"');
+
 const stats = {
   "%GH_CONTRIBUTORS%": lastPage ?? String(((await contributorsRes.json()) as unknown[]).length),
   "%ACTIVITY%": activity,
+  "%CONTRIBUTORS%": contributors,
+  "%LEADERBOARD%": leaderboard,
+  "%CREDITS%": credits,
 };
 
 // The manifesto has one source, content/manifesto.md (identical to MANIFESTO.md in OpenFrontierLabs/openfrontier).
@@ -123,19 +220,25 @@ const css = tw.stdout.toString()
 const cssName = `app-${hash(css)}.css`;
 await writeFile(join(dist, "assets", cssName), css);
 
-// The dashboard's own styles ship only with /dashboard, so the home page doesn't carry them.
-const dashTw = Bun.spawnSync([join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/dashboard.css"), "--minify"], { cwd: root, stdout: "pipe", stderr: "inherit" });
-if (dashTw.exitCode !== 0) throw new Error("tailwindcss failed on src/dashboard.css");
-const dashCss = dashTw.stdout.toString();
-const dashCssName = `dash-${hash(dashCss)}.css`;
-await writeFile(join(dist, "assets", dashCssName), dashCss);
+// The dashboard's and the contributors page's own styles ship only with those pages, so the home page doesn't carry them.
+async function pageCss(src: string, prefix: string): Promise<string> {
+  const tw = Bun.spawnSync([join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src", src), "--minify"], { cwd: root, stdout: "pipe", stderr: "inherit" });
+  if (tw.exitCode !== 0) throw new Error(`tailwindcss failed on src/${src}`);
+  const out = tw.stdout.toString();
+  const name = `${prefix}-${hash(out)}.css`;
+  await writeFile(join(dist, "assets", name), out);
+  return `/assets/${name}`;
+}
+const dashCssUrl = await pageCss("dashboard.css", "dash");
+const peopleCssUrl = await pageCss("contributors.css", "people");
 
 for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith(".html"))) {
   const html = withPartials(await readFile(join(root, "src", file), "utf8"))
     .replaceAll("%MANIFESTO_TITLE%", manifestoTitle)
     .replaceAll("%MANIFESTO%", manifesto)
     .replaceAll("%CSS%", `/assets/${cssName}`)
-    .replaceAll("%DASH_CSS%", `/assets/${dashCssName}`)
+    .replaceAll("%DASH_CSS%", dashCssUrl)
+    .replaceAll("%PEOPLE_CSS%", peopleCssUrl)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);
   await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
