@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const dist = join(import.meta.dir, "../dist");
@@ -8,8 +8,9 @@ if (build.exitCode !== 0) throw new Error("build failed");
 const read = (f: string) => readFileSync(join(dist, f), "utf8");
 const index = read("index.html");
 const manifestoPage = read("manifesto.html");
-const pages = { "index.html": index, "manifesto.html": manifestoPage };
-const all = `${index}\n${manifestoPage}\n${read("404.html")}`;
+const dashboard = read("dashboard.html");
+const pages = { "index.html": index, "manifesto.html": manifestoPage, "dashboard.html": dashboard };
+const all = `${index}\n${manifestoPage}\n${dashboard}\n${read("404.html")}`;
 
 describe("dist", () => {
   test("required files exist; no redirects file", () => {
@@ -97,10 +98,9 @@ describe("dist", () => {
     expect(h).toContain("frame-ancestors 'none'");
   });
 
-  test("html + css + fonts within raw size budget; images are separate", () => {
+  test("home page html + its css + fonts within raw size budget; images are separate", () => {
     expect(statSync(join(dist, "index.html")).size).toBeLessThan(60_000);
-    const code = readdirSync(join(dist, "assets"))
-      .filter((f) => /\.(css|woff2)$/.test(f))
+    const code = [...new Set([...index.matchAll(/href="\/assets\/([^"]+\.(?:css|woff2))"/g)].map((m) => m[1]!))]
       .reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
     expect(code + statSync(join(dist, "index.html")).size).toBeLessThan(150_000);
   });
@@ -115,6 +115,22 @@ describe("dist", () => {
     for (const fake of ["18,400", "420K", "1,200+", "380+"]) expect(index).not.toContain(fake);
     expect(index).toContain("The network starts with you. Run 0 opens soon.");
     expect(index).not.toContain("%GH_");
+  });
+
+  test("dashboard: real numbers and a real activity feed, never the mockup's", () => {
+    for (const fake of ["18,642", "424,771", "1,203", "389", "12,480", "72.4%", "74.2%", "OFL-LLM-32B", "RUNNING"]) expect(dashboard).not.toContain(fake);
+    expect(dashboard).not.toMatch(/%[A-Z_]+%/);
+    const items = [...dashboard.matchAll(/<li><svg class="act-ico"[^]*?href="(https:\/\/github\.com\/OpenFrontierLabs\/[^"]+\/pull\/\d+)"[^]*?<time datetime="([^"]+)"/g)];
+    expect(items.length).toBeGreaterThan(0);
+    const times = items.map((m) => m[2]!);
+    expect([...times].sort().reverse()).toEqual(times);
+  });
+
+  test("only the dashboard may submit a form, and only to GitHub", () => {
+    const h = read("_headers");
+    expect(h.match(/form-action [^;]+/g)).toEqual(["form-action 'none'", "form-action https://github.com"]);
+    expect(h).toMatch(/\/dashboard\n {2}! Content-Security-Policy\n {2}Content-Security-Policy: [^\n]*form-action https:\/\/github\.com/);
+    expect(dashboard).toContain('<form class="dash-search" action="https://github.com/OpenFrontierLabs/openfrontier/search" method="get"');
   });
 
   test("og.png is 1200x630", () => {

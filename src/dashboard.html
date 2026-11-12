@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network dashboard | Open Frontier Labs</title>
+<meta name="description" content="The Open Frontier Labs network as it stands: contributors, GPUs, training runs and open models, all real numbers. Run 0 is forming.">
+<link rel="canonical" href="https://openfrontier-labs.com/dashboard">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Open Frontier Labs">
+<meta property="og:title" content="Open Frontier Labs network dashboard">
+<meta property="og:description" content="Real numbers only. Run 0 is forming.">
+<meta property="og:url" content="https://openfrontier-labs.com/dashboard">
+<meta property="og:image" content="https://openfrontier-labs.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://openfrontier-labs.com/og.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="%FONT%" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="%DISPLAY%" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="%ART:horizon-d.avif%" type="image/avif" media="(min-width: 48rem)">
+<link rel="stylesheet" href="%CSS%">
+<link rel="stylesheet" href="%DASH_CSS%">
+</head>
+<body class="dash-body">
+<!--#partial sprite-->
+<!--#partial sprite-dash-->
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-frontier focus:px-4 focus:py-2 focus:font-semibold focus:text-graphite">Skip to content</a>
+
+<div class="dash">
+<aside class="dash-side">
+<a href="/" class="dash-brand"><img src="/icon-192.png" width="48" height="48" alt=""><span>Open<br>Frontier<br>Labs</span></a>
+<p class="dash-tagline">Frontier intelligence.<br>Built together.</p>
+<nav class="dash-nav" aria-label="Dashboard">
+<a href="/dashboard" aria-current="page"><svg aria-hidden="true"><use href="#i-home"/></svg>Dashboard</a>
+<a href="#run"><svg aria-hidden="true"><use href="#i-train"/></svg>Training</a>
+<a href="#network"><svg aria-hidden="true"><use href="#i-globe"/></svg>Network</a>
+<a href="#activity"><svg aria-hidden="true"><use href="#i-pulse"/></svg>Activity</a>
+<a href="/manifesto"><svg aria-hidden="true"><use href="#i-doc"/></svg>Manifesto</a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/CONTRIBUTING.md" rel="noopener"><svg aria-hidden="true"><use href="#i-code"/></svg>Contribute</a>
+<a href="/#community"><svg aria-hidden="true"><use href="#i-people"/></svg>Community</a>
+<a href="/#research"><svg aria-hidden="true"><use href="#i-flask"/></svg>Research</a>
+<hr>
+<a href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/docs" rel="noopener"><svg aria-hidden="true"><use href="#i-book"/></svg>Docs<svg class="dash-ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
+<a href="https://github.com/OpenFrontierLabs" rel="noopener"><svg aria-hidden="true"><use href="#i-gh"/></svg>GitHub<svg class="dash-ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
+</nav>
+<a class="dash-me" href="/join"><span class="dash-me-avatar" aria-hidden="true"><svg><use href="#i-gh"/></svg></span><span><b>Guest</b><small>Sign up with GitHub</small></span><svg class="dash-me-arr" aria-hidden="true"><use href="#i-arr"/></svg></a>
+</aside>
+
+<div class="dash-main">
+<header class="dash-top">
+<form class="dash-search" action="https://github.com/OpenFrontierLabs/openfrontier/search" method="get" role="search">
+<svg aria-hidden="true"><use href="#i-search"/></svg>
+<label class="sr-only" for="q">Search the openfrontier repository on GitHub</label>
+<input id="q" name="q" type="search" placeholder="Search runs, configs, docs and code on GitHub" autocomplete="off">
+<kbd>Enter</kbd>
+</form>
+<a class="btn btn-primary btn-sm" href="/join"><svg class="size-4" aria-hidden="true"><use href="#i-play"/></svg><span>Join the Network</span></a>
+</header>
+
+<main id="main" class="dash-grid">
+<section class="dash-hero" aria-labelledby="dash-h">
+<picture class="dash-hero-bg" aria-hidden="true">
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.avif%" type="image/avif">
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.webp%" type="image/webp">
+<source srcset="%ART:horizon-m.avif%" type="image/avif">
+<source srcset="%ART:horizon-m.webp%" type="image/webp">
+<img src="%ART:horizon-m.png%" width="828" height="486" alt="" decoding="async">
+</picture>
+<p class="dash-eyebrow">The open frontier</p>
+<h1 id="dash-h">Open infrastructure for collective frontier intelligence.</h1>
+<p>Contribute compute, train in the open and share every checkpoint. This dashboard shows the network as it really is: Run 0 is forming, and nothing has been trained yet.</p>
+<div class="dash-ctas">
+<a class="btn btn-primary" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md" rel="noopener"><svg class="size-4" aria-hidden="true"><use href="#i-play"/></svg>Run Run 0 yourself</a>
+<a class="btn" href="/manifesto"><svg class="size-4" aria-hidden="true"><use href="#i-doc"/></svg>Read the manifesto</a>
+</div>
+</section>
+
+<ul class="dash-stats" aria-label="Network at a glance">
+<li><svg aria-hidden="true"><use href="#i-people"/></svg><div><b>%GH_CONTRIBUTORS%</b><span>Contributors on GitHub</span></div></li>
+<li><svg aria-hidden="true"><use href="#i-gpu"/></svg><div><b>0</b><span>GPUs in network</span></div><small>none joined yet</small></li>
+<li><svg aria-hidden="true"><use href="#i-bolt"/></svg><div><b>0</b><span>Training runs</span></div><small>Run 0 forming</small></li>
+<li><svg aria-hidden="true"><use href="#i-weights"/></svg><div><b>0</b><span>Open models</span></div><small>none released yet</small></li>
+</ul>
+
+<section id="run" class="dcard dcard-run" aria-labelledby="run-h">
+<header><h2 id="run-h">Active training run</h2><span class="dchip"><i aria-hidden="true"></i>Forming</span><a class="dlink" href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md" rel="noopener">Details <svg aria-hidden="true"><use href="#i-arr"/></svg></a></header>
+<div class="run-body">
+<div class="run-stack" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="run-info">
+<h3>OFL Run 0</h3>
+<p>Dense, about 1B parameters · OLMo-core · one GPU node</p>
+<div class="run-bar" role="progressbar" aria-label="Run 0 training progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+<p class="run-state"><b>0%</b> Not started: launcher, config and pinned upstreams are ready</p>
+<ul class="run-meta"><li><svg aria-hidden="true"><use href="#i-gpu"/></svg>0 GPUs</li><li><svg aria-hidden="true"><use href="#i-people"/></svg>0 peers</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>CPU smoke passes</li></ul>
+</div>
+</div>
+</section>
+
+<section class="dcard dcard-mine" aria-labelledby="mine-h">
+<header><h2 id="mine-h">Your contribution</h2><a class="dlink" href="/join">Sign up <svg aria-hidden="true"><use href="#i-arr"/></svg></a></header>
+<p class="mine-val"><b>0</b> GPU·h</p>
+<p class="mine-note">Nodes are counted from Run 0 on, by GitHub handle, in the public compute ledger.</p>
+<div class="mine-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+
+<section id="activity" class="dcard dcard-act" aria-labelledby="act-h">
+<header><h2 id="act-h">Recent activity</h2><a class="dlink" href="https://github.com/OpenFrontierLabs" rel="noopener">View all <svg aria-hidden="true"><use href="#i-arr"/></svg></a></header>
+<ol class="act-list">
+%ACTIVITY%
+</ol>
+</section>
+
+<section id="network" class="dcard dcard-map" aria-labelledby="map-h">
+<header><h2 id="map-h">Global training network</h2></header>
+<div class="map-body">
+<div class="map-art">
+<!--#partial world-dots-->
+<p class="map-note">No node has joined yet. The first lights appear when Run 0 opens.</p>
+</div>
+<ul class="map-stats">
+<li><svg aria-hidden="true"><use href="#i-pin"/></svg><div><b>0</b><span>Regions</span></div></li>
+<li><svg aria-hidden="true"><use href="#i-globe"/></svg><div><b>0</b><span>Countries</span></div></li>
+<li><svg aria-hidden="true"><use href="#i-mesh"/></svg><div><b>0</b><span>Nodes online</span></div></li>
+</ul>
+</div>
+</section>
+
+<section class="dcard dcard-util" aria-labelledby="util-h">
+<header><h2 id="util-h">Network utilization</h2><span class="dchip dchip-quiet">Run 0: forming</span></header>
+<div class="util-body">
+<div class="donut" role="img" aria-label="0% utilization: no GPUs in the network yet"><b>0%</b><span>No GPUs yet</span></div>
+<ul class="util-legend">
+<li><i class="sw sw-1" aria-hidden="true"></i>NVIDIA (CUDA)<b>0%</b></li>
+<li><i class="sw sw-2" aria-hidden="true"></i>Apple Silicon<b>0%</b></li>
+<li><i class="sw sw-3" aria-hidden="true"></i>AMD (ROCm)<b>0%</b></li>
+<li><i class="sw sw-4" aria-hidden="true"></i>CPU / other<b>0%</b></li>
+</ul>
+<p class="util-note">NVIDIA is the first target; Apple Silicon, AMD and the rest are planned.</p>
+</div>
+</section>
+
+<section class="dcard dash-quick" aria-labelledby="quick-h">
+<h2 id="quick-h"><i aria-hidden="true"></i>Quick actions</h2>
+<a href="/join"><svg aria-hidden="true"><use href="#i-laptop"/></svg><span><b>Contribute compute</b><small>Sign up and join the waitlist</small></span></a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/docs/run0.md" rel="noopener"><svg aria-hidden="true"><use href="#i-play"/></svg><span><b>Run training</b><small>Launch Run 0 on one GPU node</small></span></a>
+<a href="/#try"><svg aria-hidden="true"><use href="#i-term"/></svg><span><b>Try the smoke test</b><small>CPU only, no GPU needed</small></span></a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/manifests" rel="noopener"><svg aria-hidden="true"><use href="#i-db"/></svg><span><b>See the data</b><small>Dataset manifests and licences</small></span></a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier/tree/main/docs" rel="noopener"><svg aria-hidden="true"><use href="#i-book"/></svg><span><b>Read the design</b><small>Phases, Run 0, joining a node</small></span></a>
+</section>
+
+<p class="dash-foot">Every number on this page is real: GitHub data is read when the site is built, and everything else is zero until Run 0 starts. <a href="/">openfrontier-labs.com</a></p>
+</main>
+</div>
+</div>
+</body>
+</html>
