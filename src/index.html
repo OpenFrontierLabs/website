@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open Frontier Labs: open infrastructure for collective frontier intelligence</title>
-<meta name="description" content="A community lab building fully open models (data, code, recipes, checkpoints, logs and weights) on pooled, distributed community compute.">
+<meta name="description" content="A community lab building fully open models (data, code, recipes, checkpoints, logs and weights) on pooled, distributed community compute. Early stage: nothing has been trained yet.">
 <link rel="canonical" href="https://openfrontier-labs.com/">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
@@ -16,7 +16,7 @@
 <meta property="og:image" content="https://openfrontier-labs.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Open Frontier Labs: a green arc horizon and a star above a glowing earth, with the tagline Frontier intelligence. Built together.">
+<meta property="og:image:alt" content="Open Frontier Labs: a green arc and road leading to a star, with the tagline Frontier intelligence. Built together.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Open Frontier Labs">
 <meta name="twitter:description" content="Open infrastructure for collective frontier intelligence.">
@@ -27,202 +27,273 @@
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="%FONT%" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="%DISPLAY%" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="%ART:mark-448.avif%" type="image/avif" fetchpriority="high">
+<link rel="preload" as="image" href="%ART:arc-hero.avif%" type="image/avif" fetchpriority="high">
 <link rel="preload" as="image" href="%ART:horizon-m.avif%" type="image/avif" media="(max-width: 47.99rem)">
 <link rel="preload" as="image" href="%ART:horizon-d.avif%" type="image/avif" media="(min-width: 48rem)">
 <link rel="stylesheet" href="%CSS%">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Open Frontier Labs","url":"https://openfrontier-labs.com/","logo":"https://openfrontier-labs.com/icon-512.png","description":"Open infrastructure for collective frontier intelligence.","sameAs":["https://github.com/OpenFrontierLabs","https://x.com/openfrontlabs"]}</script>
 </head>
 <body>
+<svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="ig" gradientUnits="userSpaceOnUse" x1="6" y1="4" x2="42" y2="44"><stop offset="0" stop-color="#d4ffd0"/><stop offset="1" stop-color="#2fc653"/></linearGradient>
+<linearGradient id="if" gradientUnits="userSpaceOnUse" x1="24" y1="4" x2="24" y2="44"><stop offset="0" stop-color="#66e36e" stop-opacity=".4"/><stop offset="1" stop-color="#1b7f46" stop-opacity=".06"/></linearGradient>
+<g id="slab"><path d="M24 7 42 14 24 21 6 14Z" fill="url(#if)"/><path d="M6 14v4.5l18 7 18-7V14"/></g>
+<symbol id="i-compute" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" fill="none"><use href="#slab" y="15"/><use href="#slab" y="7.5"/><use href="#slab"/></g><g fill="#66e36e"><circle cx="30" cy="38" r="1.3"/><circle cx="35" cy="36" r="1.3"/></g></symbol>
+<symbol id="i-train" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" fill="none"><path d="M6 32 24 39l18-7M6 24l18 7 18-7" /><path d="M24 7 42 14 24 21 6 14Z" fill="url(#if)" transform="translate(0 3)"/><path d="M6 24l18 7 18-7" stroke-opacity=".7"/></g></symbol>
+<symbol id="i-weights" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" fill="none"><path d="M24 4 41 14v20L24 44 7 34V14Z" fill="url(#if)"/><path d="M7 14l17 10 17-10M24 24v20"/></g></symbol>
+<symbol id="i-hetero" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.6" fill="none"><path d="M24 24 9 14M24 24l16-11M24 24 8 33M24 24l16 9M24 24 24 7M9 14 8 33M40 13l0 20"/></g><g fill="url(#if)" stroke="url(#ig)" stroke-width="1.6"><circle cx="24" cy="24" r="5"/><circle cx="9" cy="14" r="3.5"/><circle cx="40" cy="13" r="3.5"/><circle cx="8" cy="33" r="3.5"/><circle cx="40" cy="33" r="3.5"/><circle cx="24" cy="7" r="3.5"/></g></symbol>
+<symbol id="i-laptop" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" fill="none"><rect x="9" y="9" width="30" height="21" rx="2.5" fill="url(#if)"/><path d="M4 36h40l-3 3H7Z"/><path d="M24 14 31 25H17Z" stroke-width="1.4"/></g></symbol>
+<symbol id="i-mesh" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.5" fill="none"><path d="M24 5 41 14.5v19L24 43 7 33.5v-19Z" fill="url(#if)"/><path d="M24 5 24 24M7 14.5 24 24M41 14.5 24 24M24 43 24 24M7 33.5 41 14.5M41 33.5 7 14.5" stroke-opacity=".7"/></g><g fill="#a8f5ad"><circle cx="24" cy="24" r="3"/><circle cx="24" cy="5" r="2.2"/><circle cx="41" cy="14.5" r="2.2"/><circle cx="41" cy="33.5" r="2.2"/><circle cx="24" cy="43" r="2.2"/><circle cx="7" cy="33.5" r="2.2"/><circle cx="7" cy="14.5" r="2.2"/></g></symbol>
+<symbol id="i-doc" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><path d="M12 5h17l9 9v29H12Z" fill="url(#if)"/><path d="M29 5v9h9M17 21h14M17 28h9"/><circle cx="35" cy="37" r="8" fill="#031a08"/><path d="m31 37 3 3 5-6"/></g></symbol>
+<symbol id="i-chip" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><rect x="11" y="11" width="26" height="26" rx="4" fill="url(#if)"/><rect x="18" y="18" width="12" height="12" rx="2"/><path d="M17 5v6M24 5v6M31 5v6M17 37v6M24 37v6M31 37v6M5 17h6M5 24h6M5 31h6M37 17h6M37 24h6M37 31h6"/></g></symbol>
+<symbol id="i-gpu" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><rect x="4" y="12" width="40" height="22" rx="3" fill="url(#if)"/><circle cx="17" cy="23" r="6.5"/><circle cx="17" cy="23" r="1.5"/><circle cx="33" cy="23" r="6.5"/><circle cx="33" cy="23" r="1.5"/><path d="M9 34v4h10v-4"/></g></symbol>
+<symbol id="i-repo" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linecap="round" fill="none"><circle cx="14" cy="10" r="4"/><circle cx="14" cy="38" r="4"/><circle cx="34" cy="20" r="4"/><path d="M14 14v20M34 24c0 7-9 6-18 12"/></g></symbol>
+<symbol id="i-people" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linecap="round" fill="none"><circle cx="18" cy="16" r="6" fill="url(#if)"/><path d="M6 40c0-8 5-13 12-13s12 5 12 13"/><circle cx="34" cy="19" r="4.5"/><path d="M34 29c5 0 8 4 8 10"/></g></symbol>
+<symbol id="i-flask" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><path d="M19 5h10M21 5v14L9 38a3 3 0 0 0 3 5h24a3 3 0 0 0 3-5L27 19V5" fill="url(#if)"/><path d="M14 31h20"/></g></symbol>
+<symbol id="i-globe" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" fill="none"><circle cx="24" cy="24" r="18" fill="url(#if)"/><path d="M6 24h36M24 6c-8 9-8 27 0 36M24 6c8 9 8 27 0 36"/></g></symbol>
+<symbol id="i-p2p" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" fill="none"><path d="M24 12 11 34M24 12l13 22M11 34h26"/><circle cx="24" cy="12" r="5" fill="url(#if)"/><circle cx="11" cy="34" r="5" fill="url(#if)"/><circle cx="37" cy="34" r="5" fill="url(#if)"/></g></symbol>
+<symbol id="i-hash" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><path d="M24 5 41 14v20L24 43 7 34V14Z" fill="url(#if)"/><path d="M20 17l-3 14M29 17l-3 14M15 21h17M14 27h17"/></g></symbol>
+<symbol id="i-shield" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><path d="M24 4 40 10v13c0 10-7 17-16 21C15 40 8 33 8 23V10Z" fill="url(#if)"/><path d="m17 24 5 5 9-10"/></g></symbol>
+<symbol id="i-audit" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M10 5h18l8 8v10M10 5v38h14" fill="url(#if)"/><circle cx="34" cy="34" r="7"/><path d="m39 39 5 5M16 18h12M16 26h8"/></g></symbol>
+<symbol id="i-elastic" viewBox="0 0 48 48"><g stroke="url(#ig)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"><path d="M6 20V6h14M42 20V6H28M6 28v14h14M42 28v14H28"/><circle cx="24" cy="24" r="5" fill="url(#if)"/></g></symbol>
+<symbol id="i-arr" viewBox="0 0 24 24"><path d="M4 12h15m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path fill="currentColor" d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.78L17.75 3Zm-1.08 16.16h1.7L7.4 4.74H5.58l11.09 14.42Z"/></symbol>
+</defs>
+</svg>
 <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-frontier focus:px-4 focus:py-2 focus:font-semibold focus:text-graphite">Skip to content</a>
 
-<header class="sticky top-0 z-40 border-b border-white/10 bg-graphite/85 backdrop-blur">
-<div class="wrap flex h-14 items-center justify-between gap-4">
-<a href="#top" class="flex items-center gap-3 font-display text-xs tracking-[0.22em] text-soft">
-<picture><source srcset="%ART:mark-96.avif%" type="image/avif"><source srcset="%ART:mark-96.webp%" type="image/webp"><img src="%ART:mark-96.png%" width="32" height="32" alt="" class="size-8"></picture>
-OPEN FRONTIER LABS</a>
-<nav aria-label="Primary" class="flex items-center gap-6 text-sm text-mist">
-<a href="#manifesto" class="hidden hover:text-soft md:inline">Manifesto</a>
-<a href="#pillars" class="hidden hover:text-soft md:inline">Pillars</a>
-<a href="#how" class="hidden hover:text-soft md:inline">How it works</a>
-<a href="#roadmap" class="hidden hover:text-soft md:inline">Roadmap</a>
-<a href="#join" class="rounded-full border border-frontier/60 px-4 py-1.5 font-semibold text-frontier hover:bg-frontier hover:text-graphite">Join</a>
+<header class="nav">
+<div class="wrap-x flex h-16 items-center justify-between gap-4">
+<a href="#top" class="brand"><picture><source srcset="%ART:arc-160.avif%" type="image/avif"><source srcset="%ART:arc-160.webp%" type="image/webp"><img src="%ART:arc-160.png%" width="44" height="44" alt="" class="size-10 sm:size-11"></picture><span>Open Frontier Labs</span></a>
+<nav aria-label="Primary" class="hidden items-center gap-7 text-sm text-mist lg:flex">
+<a class="navlink" href="#mission">Mission</a>
+<a class="navlink" href="#platform">Platform</a>
+<a class="navlink" href="#community">Community</a>
+<a class="navlink" href="#research">Research</a>
+<a class="navlink" href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener">Docs <svg class="size-3.5" aria-hidden="true"><use href="#i-ext"/></svg></a>
+<a class="navlink" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub <svg class="size-3.5" aria-hidden="true"><use href="#i-ext"/></svg></a>
 </nav>
+<div class="flex items-center gap-3">
+<a class="btn btn-primary btn-sm hidden sm:inline-flex" href="#join"><span>Join the Network</span><svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
+<details class="menu lg:hidden">
+<summary aria-label="Menu"><span></span></summary>
+<div class="menu-panel">
+<a href="#mission">Mission</a>
+<a href="#platform">Platform</a>
+<a href="#community">Community</a>
+<a href="#research">Research</a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener">Docs</a>
+<a href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a>
+<a href="#join" class="join-link sm:hidden">Join the Network</a>
+</div>
+</details>
+</div>
 </div>
 </header>
 
 <main id="main">
-<section id="top" class="relative isolate overflow-hidden pt-10 sm:pt-14">
-<div class="wrap relative z-10 flex flex-col items-center text-center">
-<picture><source srcset="%ART:mark-448.avif%" type="image/avif"><source srcset="%ART:mark-448.webp%" type="image/webp"><img src="%ART:mark-448.png%" width="448" height="448" alt="Open Frontier Labs mark: a green hexagon with a star at its centre" class="mark" fetchpriority="high" decoding="async"></picture>
-<h1 class="wordmark mt-4"><span>Open</span> <span>Frontier</span> <span>Labs</span></h1>
-<p class="brackets mt-10"><span class="bracket-line">Frontier intelligence.</span> <span class="bracket-line text-frontier">Built together.</span></p>
-<ul class="pillars mt-12" aria-label="What open means here">
-<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M16 4 28 10 16 16 4 10Z"/><path d="M4 15.5 16 21.5 28 15.5"/><path d="M4 21 16 27 28 21"/></svg><span>Open<br>Compute</span></li>
-<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M16 5 26 24H6Z"/><circle cx="16" cy="5" r="2.6" fill="currentColor"/><circle cx="26" cy="24" r="2.6" fill="currentColor"/><circle cx="6" cy="24" r="2.6" fill="currentColor"/></svg><span>Open<br>Training</span></li>
-<li><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 9 4 16l7 7"/><path d="M21 9l7 7-7 7"/><path d="M18 7 14 25"/></svg><span>Open<br>Weights</span></li>
-</ul>
-</div>
-<div class="horizon relative z-0 mt-6 sm:mt-10">
-<picture>
+<section id="top" class="hero">
+<picture class="hero-bg" aria-hidden="true">
 <source media="(min-width: 48rem)" srcset="%ART:horizon-d.avif%" type="image/avif">
 <source media="(min-width: 48rem)" srcset="%ART:horizon-d.webp%" type="image/webp">
 <source srcset="%ART:horizon-m.avif%" type="image/avif">
 <source srcset="%ART:horizon-m.webp%" type="image/webp">
-<img src="%ART:horizon-m.png%" width="828" height="486" alt="" class="horizon-img" decoding="async">
+<img src="%ART:horizon-m.png%" width="828" height="486" alt="" decoding="async">
 </picture>
-<div class="horizon-copy wrap">
-<p class="lede mx-auto text-center">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public.</p>
-<div class="mt-8 flex flex-wrap justify-center gap-3">
-<a class="btn btn-primary" href="#join">Join the lab</a>
-<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a>
+<div class="wrap-x hero-grid">
+<div class="hero-art">
+<div class="hero-glow" aria-hidden="true"></div>
+<picture><source srcset="%ART:arc-hero.avif%" type="image/avif"><source srcset="%ART:arc-hero.webp%" type="image/webp"><img src="%ART:arc-hero.png%" width="760" height="350" alt="Open Frontier Labs mark: a glowing green arc over a road that leads to a star" fetchpriority="high" decoding="async"></picture>
 </div>
-<p class="mt-6 text-sm text-mist">Early stage. Nothing has been trained yet.</p>
+<div class="hero-copy">
+<h1>Open infrastructure for collective frontier intelligence.</h1>
+<p class="hero-sub">Open compute. Open training. Open weights.</p>
+<p class="hero-line">A community lab building fully open models on pooled, distributed community compute. Data, code, recipes, checkpoints, logs and weights, all public. Early stage: nothing has been trained yet.</p>
+<div class="mt-8 flex flex-wrap gap-3">
+<a class="btn btn-primary" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">Get Started <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a>
+<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener">Read the Spec</a>
 </div>
 </div>
-</section>
-
-<section id="manifesto" class="section" aria-labelledby="manifesto-h">
-<div class="wrap grid gap-12 lg:grid-cols-[1fr_1.4fr]">
-<div>
-<p class="eyebrow">Manifesto</p>
-<h2 id="manifesto-h" class="h2">What OpenAI should have been, with a pure community vibe.</h2>
-<p class="lede">Frontier intelligence should be built in public and owned by the people who build it.</p>
 </div>
-<ol class="divide-y divide-white/10 border-y border-white/10">
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">1</span><p><strong class="font-semibold">Everything is open.</strong> <span class="text-mist">Data recipes, code, configs, logs, every checkpoint and the final weights, released as they happen under permissive licences.</span></p></li>
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">2</span><p><strong class="font-semibold">Owned by the community.</strong> <span class="text-mist">A nonprofit foundation structure is planned to hold the repos, marks and weights. Decisions happen in public.</span></p></li>
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">3</span><p><strong class="font-semibold">No equity, no token, no closed tier.</strong> <span class="text-mist">Nobody sits between the community and the model.</span></p></li>
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">4</span><p><strong class="font-semibold">Credit for everyone who contributes.</strong> <span class="text-mist">Compute and work are credited by name, publicly and permanently.</span></p></li>
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">5</span><p><strong class="font-semibold">Negative results are results.</strong> <span class="text-mist">We publish what failed, and why.</span></p></li>
-<li class="flex gap-5 py-5"><span class="w-6 shrink-0 font-semibold text-frontier" aria-hidden="true">6</span><p><strong class="font-semibold">Best at each size, not frontier theatre.</strong> <span class="text-mist">We aim to be the best open model at each scale we train, and we say plainly where we stand.</span></p></li>
-</ol>
+<div class="wrap-x relative z-10">
+<ul class="stats" aria-label="Network at a glance">
+<li><svg class="ico-sm" aria-hidden="true"><use href="#i-people"/></svg><div><b>%GH_CONTRIBUTORS%</b><span>Contributors on GitHub</span></div></li>
+<li><svg class="ico-sm" aria-hidden="true"><use href="#i-gpu"/></svg><div><b>0</b><span>GPUs in network</span></div></li>
+<li><svg class="ico-sm" aria-hidden="true"><use href="#i-train"/></svg><div><b>Run 0</b><span>Forming</span></div></li>
+<li><svg class="ico-sm" aria-hidden="true"><use href="#i-weights"/></svg><div><b>0</b><span>Open artifacts</span></div></li>
+</ul>
 </div>
 </section>
 
-<section id="pillars" class="section" aria-labelledby="pillars-h">
-<div class="wrap">
-<p class="eyebrow">Pillars</p>
-<h2 id="pillars-h" class="h2">Four things we build.</h2>
-<div class="mt-12 grid gap-4 sm:grid-cols-2">
-<article class="card"><h3>Open Infrastructure</h3><p>Trainers, data pipelines, a node agent and dashboards, all in public repositories anyone can clone and run.</p></article>
-<article class="card"><h3>Distributed Compute</h3><p>DiLoCo-family pretraining and asynchronous RL over pooled community and donated GPUs.</p></article>
-<article class="card"><h3>Intelligence Research</h3><p>Our own base models, evals and post-training, with every result reported, including the ones that do not work.</p></article>
-<article class="card"><h3>Exploration</h3><p>Open questions about training at the edge of what pooled hardware allows, worked on in public with whoever wants to help.</p></article>
+<section id="mission" class="section" aria-labelledby="mission-h">
+<div class="wrap-x">
+<header class="sec-head reveal">
+<p class="eyebrow">The open frontier</p>
+<h2 id="mission-h">A more open foundation for frontier AI.</h2>
+<p>Community-driven infrastructure to train and advance world-class models in public, with every step logged and every result shared. None of it is built yet.</p>
+</header>
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+<article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-compute"/></svg><h3>Open Compute</h3><p>Pool GPUs from many contributors and donated clusters into one training fabric.</p></article>
+<article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-train"/></svg><h3>Open Training</h3><p>DiLoCo-style pretraining and asynchronous RL with open tools, open data and open recipes.</p></article>
+<article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-weights"/></svg><h3>Open Weights</h3><p>Every checkpoint and the final weights are planned for release under Apache-2.0.</p></article>
+<article class="gcard reveal"><svg class="ico" aria-hidden="true"><use href="#i-hetero"/></svg><h3>Heterogeneous Participation</h3><p>Contribute what you have, from a single consumer GPU to an 8-GPU node.</p></article>
 </div>
 </div>
 </section>
 
 <section id="how" class="section" aria-labelledby="how-h">
-<div class="wrap">
+<div class="wrap-x">
+<header class="sec-head reveal">
 <p class="eyebrow">How it works</p>
-<h2 id="how-h" class="h2">Islands of GPUs, synced rarely.</h2>
-<p class="lede">Every pooled machine or cluster is an island: synchronous inside, DiLoCo-style across. Islands train locally for many steps, then exchange compressed updates (int8 or sparser) through a small coordinator and object storage. Slow links cost little, and nodes can join or leave without stopping the run.</p>
-
-<div class="mt-12 grid items-stretch gap-3 lg:grid-cols-[1fr_7.5rem_1fr_7.5rem_1fr]" role="group" aria-label="Diagram: islands feed an elastic mesh that produces checkpoints and weights">
-<div class="card flex flex-col">
-<h3>Islands</h3>
-<svg class="mt-4 w-full" viewBox="0 0 240 90" fill="none" role="img" aria-label="Three islands, each a cluster of connected GPU nodes">
-<g stroke="#1B7F46" stroke-width="1.2">
-<rect x="4" y="8" width="64" height="74" rx="10" stroke-opacity=".8"/><rect x="88" y="8" width="64" height="74" rx="10" stroke-opacity=".8"/><rect x="172" y="8" width="64" height="74" rx="10" stroke-opacity=".8"/>
-<path d="M22 28 50 28 22 62 50 62 22 28M50 28 50 62M106 28 134 28 106 62 134 62 106 28M134 28 134 62M190 28 218 28 190 62 218 62 190 28M218 28 218 62"/>
-</g>
-<g fill="#66E36E"><circle cx="22" cy="28" r="3.5"/><circle cx="50" cy="28" r="3.5"/><circle cx="22" cy="62" r="3.5"/><circle cx="50" cy="62" r="3.5"/><circle cx="106" cy="28" r="3.5"/><circle cx="134" cy="28" r="3.5"/><circle cx="106" cy="62" r="3.5"/><circle cx="134" cy="62" r="3.5"/><circle cx="190" cy="28" r="3.5"/><circle cx="218" cy="28" r="3.5"/><circle cx="190" cy="62" r="3.5"/><circle cx="218" cy="62" r="3.5"/></g>
-</svg>
-<p>Community nodes and donated clusters. Synchronous training inside each island.</p>
-</div>
-<div class="flow-link">pseudo-gradients, int8 compressed, infrequent</div>
-<div class="card flex flex-col">
-<h3>Elastic mesh</h3>
-<svg class="mt-4 w-full" viewBox="0 0 240 90" fill="none" role="img" aria-label="Mesh of islands joined by thin links">
-<g stroke="#66E36E" stroke-opacity=".55" stroke-width="1.2"><path d="M30 20 120 45 210 20M30 70 120 45 210 70M30 20 30 70M210 20 210 70M30 20 210 70M210 20 30 70"/></g>
-<g fill="#000000" stroke="#66E36E" stroke-width="2"><circle cx="30" cy="20" r="9"/><circle cx="210" cy="20" r="9"/><circle cx="30" cy="70" r="9"/><circle cx="210" cy="70" r="9"/></g>
-<circle cx="120" cy="45" r="11" fill="#66E36E"/>
-</svg>
-<p>Merges updates across islands and catches new nodes up from a live checkpoint.</p>
-</div>
-<div class="flow-link">every step logged</div>
-<div class="card flex flex-col">
-<h3>Checkpoints and weights</h3>
-<svg class="mt-4 w-full" viewBox="0 0 240 90" fill="none" role="img" aria-label="A stack of checkpoints leading to final weights">
-<g stroke="#F5F7F6" stroke-opacity=".45" stroke-width="1.2"><rect x="20" y="52" width="120" height="22" rx="5"/><rect x="20" y="30" width="120" height="22" rx="5"/><rect x="20" y="8" width="120" height="22" rx="5"/></g>
-<path d="M150 41H190" stroke="#66E36E" stroke-width="2"/>
-<rect x="190" y="22" width="40" height="38" rx="8" fill="#66E36E"/>
-</svg>
-<p>Every checkpoint, log and the final Apache-2.0 weights are published.</p>
-</div>
-</div>
-
-<div class="mt-16 grid gap-10 lg:grid-cols-2">
-<div>
-<h3 class="text-xl font-semibold tracking-tight">Compute pooling <span class="tag ml-2 align-middle">planned</span></h3>
-<p class="mt-3 text-mist">Joining is meant to be one command line. The <code>ofl</code> CLI is not built yet; this is the planned flow.</p>
-<pre class="code mt-5"><code><span class="dim"># check the machine: GPUs, drivers, bandwidth, latency, clock, disk</span>
-ofl doctor
-<span class="dim"># join a run; the node catches up from a live checkpoint</span>
-ofl join run1</code></pre>
-<p class="mt-4 text-mist">Nodes whose updates hurt the loss are dropped automatically. Rollouts for RL and evals are meant to accept any GPU; early pretraining is realistically for 8-GPU nodes and donated clusters.</p>
-</div>
-<div>
-<h3 class="text-xl font-semibold tracking-tight">Public credit ledger <span class="tag ml-2 align-middle">planned</span></h3>
-<p class="mt-3 text-mist">Credit is public and tied to repository history. A ledger in the runs repository will record, per node:</p>
-<ul class="mt-5 divide-y divide-white/10 border-y border-white/10">
-<li class="py-3">GPU-hours contributed</li>
-<li class="py-3">Tokens processed</li>
-<li class="py-3">Share of updates that helped the loss</li>
-</ul>
-<p class="mt-4 text-mist">Model cards will name compute contributors and donors by GitHub handle.</p>
-</div>
-</div>
-</div>
-</section>
-
-<section id="roadmap" class="section" aria-labelledby="roadmap-h">
-<div class="wrap">
-<p class="eyebrow">Roadmap</p>
-<h2 id="roadmap-h" class="h2">Four steps. All of it is planned.</h2>
-<p class="lede">Nothing has been trained yet. Sizes below are targets, not results, and will change as we learn what pooled compute can do.</p>
-<ol class="mt-12 grid gap-4 md:grid-cols-2">
-<li class="card"><div class="flex items-center justify-between gap-3"><h3>Run 0</h3><span class="tag">planned</span></div><p>About 1B parameters, Qwen3-style dense model, trained with DiLoCo across 4 to 8 nodes in at least two regions. A first reproducible run: configs, logs and every checkpoint.</p></li>
-<li class="card"><div class="flex items-center justify-between gap-3"><h3>Run 1</h3><span class="tag">planned</span></div><p>About 10B parameters, our first community base model. Donated clusters join as islands; a live public dashboard shows the run.</p></li>
-<li class="card"><div class="flex items-center justify-between gap-3"><h3>Distributed RL, in parallel</h3><span class="tag">planned</span></div><p>prime-rl style asynchronous RL with community-built environments. Starts on an existing open base (Olmo 3) to prove the swarm, then moves to our own.</p></li>
-<li class="card"><div class="flex items-center justify-between gap-3"><h3>Run 2</h3><span class="tag">planned</span></div><p>30B to 70B parameters, as large as the pooled and donated compute allows, on the same pipeline.</p></li>
+<h2 id="how-h">From idle compute to open frontier models.</h2>
+<p>Islands of GPUs train locally for many steps, then sync compressed updates rarely. Slow links cost little, and nodes can join or leave without stopping the run. This is the design; none of it has run yet.</p>
+</header>
+<ol class="flow">
+<li class="reveal"><svg class="ico" aria-hidden="true"><use href="#i-laptop"/></svg><h3>Your Idle Compute</h3><p>A spare machine or GPU, offered to a run.</p></li>
+<li class="flow-arrow" aria-hidden="true"><svg><use href="#i-arr"/></svg></li>
+<li class="reveal"><svg class="ico" aria-hidden="true"><use href="#i-mesh"/></svg><h3>Distributed Training Network</h3><p>Islands will join through a small coordinator and object storage.</p></li>
+<li class="flow-arrow" aria-hidden="true"><svg><use href="#i-arr"/></svg></li>
+<li class="reveal"><svg class="ico" aria-hidden="true"><use href="#i-train"/></svg><h3>Shared Checkpoints</h3><p>Every checkpoint will be published as the run goes.</p></li>
+<li class="flow-arrow" aria-hidden="true"><svg><use href="#i-arr"/></svg></li>
+<li class="reveal"><svg class="ico" aria-hidden="true"><use href="#i-weights"/></svg><h3>Open Models</h3><p>Final weights will be open for anyone to use, build on and improve.</p></li>
+<li class="flow-arrow" aria-hidden="true"><svg><use href="#i-arr"/></svg></li>
+<li class="reveal"><svg class="ico" aria-hidden="true"><use href="#i-doc"/></svg><h3>Public Evidence</h3><p>Configs, logs and a credit ledger will be open to check.</p></li>
 </ol>
 </div>
 </section>
 
-<section id="join" class="section" aria-labelledby="join-h">
-<div class="wrap">
-<p class="eyebrow">Join</p>
-<h2 id="join-h" class="h2">Build it with us.</h2>
-<p class="lede">Open a repository issue, say hello, or offer compute. Contributors are credited by name.</p>
-<div class="mt-12 grid gap-4 md:grid-cols-3">
-<a class="card block transition-colors hover:border-frontier/60" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener"><h3>GitHub</h3><p class="break-all">github.com/OpenFrontierLabs/openfrontier</p></a>
-<a class="card block transition-colors hover:border-frontier/60" href="https://x.com/openfrontlabs" rel="noopener"><h3>X</h3><p>@openfrontlabs</p></a>
-<a class="card block transition-colors hover:border-frontier/60" href="mailto:openfrontierlabs@gmail.com"><h3>Email</h3><p class="break-all">openfrontierlabs@gmail.com</p></a>
+<section id="platform" class="section" aria-labelledby="platform-h">
+<div class="wrap-x">
+<header class="sec-head reveal">
+<p class="eyebrow">Platform support</p>
+<h2 id="platform-h">Built for a diverse, high-performance ecosystem.</h2>
+<p>The goal is to welcome the hardware people already own. None of these platforms work yet: this is what we want to build, and we need help.</p>
+</header>
+<div class="grid gap-4 lg:grid-cols-3">
+<article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-chip"/></svg><span class="tag">Planned</span><h3>Apple Silicon / macOS</h3><ul class="chips"><li>M1</li><li>M2</li><li>M3</li><li>M4</li></ul><p>Planned support for M1 to M4 Macs as contributor nodes.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
+<article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-gpu"/></svg><span class="tag">Planned</span><h3>NVIDIA / CUDA / RTX</h3><ul class="chips"><li>CUDA</li><li>RTX</li><li>GeForce</li></ul><p>The first target: CUDA training from consumer RTX cards up to 8-GPU nodes.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
+<article class="gcard plat reveal"><svg class="plat-ico" aria-hidden="true"><use href="#i-hetero"/></svg><span class="tag">Planned</span><h3>Heterogeneous GPUs</h3><ul class="chips"><li>AMD</li><li>Intel</li><li>Others</li></ul><p>A flexible platform for any consumer or prosumer GPU. Not built yet.</p><a class="more" href="https://github.com/OpenFrontierLabs/openfrontier/issues" rel="noopener">Help us build it <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></a></article>
 </div>
-<div class="card mt-4 flex flex-col items-start gap-5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
-<div class="max-w-xl">
-<h3 class="text-xl">Donate compute</h3>
-<p>Have GPUs to pool? Send a short note with your name or handle, GPUs and count, region, bandwidth, availability and how you want credit. It opens your email client with a template. No form, no tracking.</p>
 </div>
-<a class="btn btn-primary shrink-0" href="mailto:openfrontierlabs@gmail.com?subject=Donate%20compute%20to%20Open%20Frontier%20Labs&amp;body=Name%20%2F%20handle%3A%0A%0AGPUs%20and%20count%3A%0A%0ARegion%3A%0A%0ABandwidth%3A%0A%0AAvailability%3A%0A%0AHow%20you%20want%20credit%3A%0A">Email a compute offer</a>
+</section>
+
+<section id="community" class="section" aria-labelledby="community-h">
+<div class="wrap-x">
+<header class="sec-head reveal">
+<p class="eyebrow">Open community</p>
+<h2 id="community-h">A global, open-source effort.</h2>
+<p>Build, train and advance frontier intelligence together, in the open. Credit goes to everyone who contributes, by name.</p>
+</header>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+<article class="gcard tile reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-repo"/></svg><h3>Open Repos</h3><p>Planned: trainers, data pipelines and a node agent, all in public repositories.</p></article>
+<article class="gcard tile reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-hash"/></svg><h3>Public Checkpoints</h3><p>Planned: every checkpoint released as it is produced.</p></article>
+<article class="gcard tile reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-people"/></svg><h3>Community Governance</h3><p>Decisions in public; a nonprofit foundation is planned.</p></article>
+<article class="gcard tile reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-flask"/></svg><h3>Research Collaboration</h3><p>Methods, evals and negative results, shared openly.</p></article>
+<article class="gcard tile reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-globe"/></svg><h3>Global Contributors</h3><p>Open to builders, researchers and compute providers anywhere.</p></article>
+</div>
+</div>
+</section>
+
+<section id="research" class="section" aria-labelledby="research-h">
+<div class="wrap-x">
+<header class="sec-head reveal">
+<p class="eyebrow">Research and protocol</p>
+<h2 id="research-h">An open protocol for distributed AI.</h2>
+<p>The foundation we are designing for large-scale, community-driven training. Specified in the open; not yet implemented.</p>
+</header>
+<div class="proto">
+<article class="reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-p2p"/></svg><h3>Peer-to-Peer Networking</h3><p>Decentralized coordination of training across contributors.</p></article>
+<article class="reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-hash"/></svg><h3>Content-Addressed Artifacts</h3><p>Planned: models, checkpoints and data identified by their hash.</p></article>
+<article class="reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-shield"/></svg><h3>Verification</h3><p>Planned: nodes whose updates hurt the loss are dropped automatically.</p></article>
+<article class="reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-audit"/></svg><h3>Auditability</h3><p>Planned: every step logged, results traceable to configs and code.</p></article>
+<article class="reveal"><svg class="ico-md" aria-hidden="true"><use href="#i-elastic"/></svg><h3>Elastic Participation</h3><p>Join, leave or scale compute with minimal friction.</p></article>
+</div>
+</div>
+</section>
+
+<section id="network" class="section" aria-labelledby="network-h">
+<div class="wrap-x">
+<div class="net gcard">
+<div class="net-copy">
+<p class="eyebrow">Network growth</p>
+<h2 id="network-h">The network starts with you.</h2>
+<p>Nothing has been trained and no GPU has joined yet. This chart will plot real numbers from the first run; until then it stays empty on purpose.</p>
+</div>
+<div class="chart-wrap">
+<input type="radio" name="tab" id="t1" class="sr-only" checked>
+<input type="radio" name="tab" id="t2" class="sr-only">
+<input type="radio" name="tab" id="t3" class="sr-only">
+<input type="radio" name="tab" id="t4" class="sr-only">
+<div class="tabs" role="group" aria-label="Chart metric">
+<label for="t1">Contributors</label><label for="t2">GPUs</label><label for="t3">Training Runs</label><label for="t4">Open Artifacts</label>
+</div>
+<div class="panel p1"><p class="val">%GH_CONTRIBUTORS%</p><p class="cap">Contributors on GitHub, read from github.com at build time</p></div>
+<div class="panel p2"><p class="val">0</p><p class="cap">GPUs in the network</p></div>
+<div class="panel p3"><p class="val">Run 0: forming</p><p class="cap">Training runs</p></div>
+<div class="panel p4"><p class="val">0</p><p class="cap">Open artifacts released</p></div>
+<div class="chart">
+<svg viewBox="0 0 640 220" role="img" aria-label="Empty chart: no data yet">
+<g class="grid-l"><path d="M40 20H624M40 70H624M40 120H624"/></g>
+<path class="base-glow" d="M40 180H624"/>
+<path class="base" d="M40 180H624"/>
+<g class="ticks"><text x="30" y="184" text-anchor="end">0</text></g>
+<circle class="dot" cx="624" cy="180" r="4.5"/>
+</svg>
+<p class="chart-note">The network starts with you. Run 0 opens soon.</p>
+</div>
+</div>
+<ol class="plan">
+<li><span class="tag">Planned</span><b>Run 0</b><p>About 1B parameters, DiLoCo across 4 to 8 nodes in two regions.</p></li>
+<li><span class="tag">Planned</span><b>Run 1</b><p>About 10B parameters, our first community base model.</p></li>
+<li><span class="tag">Planned</span><b>Distributed RL</b><p>Asynchronous RL with community-built environments.</p></li>
+<li><span class="tag">Planned</span><b>Run 2</b><p>30B to 70B parameters, as large as pooled compute allows.</p></li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="join" class="join" aria-labelledby="join-h">
+<picture class="join-bg" aria-hidden="true">
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.avif%" type="image/avif">
+<source media="(min-width: 48rem)" srcset="%ART:horizon-d.webp%" type="image/webp">
+<source srcset="%ART:horizon-m.avif%" type="image/avif">
+<source srcset="%ART:horizon-m.webp%" type="image/webp">
+<img src="%ART:horizon-m.png%" width="828" height="486" alt="" loading="lazy" decoding="async">
+</picture>
+<div class="wrap-x relative z-10">
+<header class="sec-head reveal">
+<h2 id="join-h">Join Open Frontier Labs.</h2>
+<p>Contribute compute, build with the protocol, and help advance open frontier intelligence with a global community.</p>
+</header>
+<div class="join-grid">
+<a class="btn btn-primary" href="mailto:openfrontierlabs@gmail.com?subject=Donate%20compute%20to%20Open%20Frontier%20Labs&amp;body=Name%20%2F%20handle%3A%0A%0AGPUs%20and%20count%3A%0A%0ARegion%3A%0A%0ABandwidth%3A%0A%0AAvailability%3A%0A%0AHow%20you%20want%20credit%3A%0A"><span>Join the Network <svg class="size-4" aria-hidden="true"><use href="#i-arr"/></svg></span><small>Email a compute offer</small></a>
+<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener"><span>Build with the Protocol</span><small>Read the README and the design</small></a>
+<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier#readme" rel="noopener"><span>Explore the Docs</span><small>Start with the README</small></a>
+<a class="btn" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener"><span>View on GitHub <svg class="size-4" aria-hidden="true"><use href="#i-ext"/></svg></span><small>Open source, open collaboration</small></a>
 </div>
 </div>
 </section>
 </main>
 
-<footer class="border-t border-white/10 py-12 text-sm text-mist">
-<div class="wrap flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-<div class="max-w-md">
-<p class="flex items-center gap-3 font-display text-xs tracking-[0.22em] text-soft"><picture><source srcset="%ART:arc-160.avif%" type="image/avif"><source srcset="%ART:arc-160.webp%" type="image/webp"><img src="%ART:arc-160.png%" width="48" height="48" alt="" class="size-12" loading="lazy" decoding="async"></picture>OPEN FRONTIER LABS</p>
-<p class="mt-3">Code and weights are planned under Apache-2.0. This site's repository is Apache-2.0 licensed.</p>
-<p class="mt-3">Nothing here is a claim about results.</p>
+<footer class="foot">
+<div class="wrap-x flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+<div>
+<a href="#top" class="brand"><picture><source srcset="%ART:arc-160.avif%" type="image/avif"><source srcset="%ART:arc-160.webp%" type="image/webp"><img src="%ART:arc-160.png%" width="44" height="44" alt="" class="size-10" loading="lazy" decoding="async"></picture><span>Open Frontier Labs</span></a>
+<p class="mt-3 max-w-md">Code and weights are planned under Apache-2.0. Nothing here is a claim about results.</p>
 </div>
-<ul class="flex flex-wrap gap-x-6 gap-y-2">
-<li><a class="link" href="https://github.com/OpenFrontierLabs/openfrontier" rel="noopener">GitHub</a></li>
-<li><a class="link" href="https://x.com/openfrontlabs" rel="noopener">X</a></li>
-<li><a class="link" href="mailto:openfrontierlabs@gmail.com">openfrontierlabs@gmail.com</a></li>
+<ul class="flex flex-wrap items-center gap-x-6 gap-y-3">
+<li><a class="navlink" href="#mission">Mission</a></li>
+<li><a class="navlink" href="#platform">Platform</a></li>
+<li><a class="navlink" href="#community">Community</a></li>
+<li><a class="navlink" href="#research">Research</a></li>
+<li><a class="navlink" href="mailto:openfrontierlabs@gmail.com">openfrontierlabs@gmail.com</a></li>
+</ul>
+<ul class="flex gap-3">
+<li><a class="social" href="https://github.com/OpenFrontierLabs" rel="noopener" aria-label="GitHub"><svg class="size-5" aria-hidden="true"><use href="#i-gh"/></svg></a></li>
+<li><a class="social" href="https://x.com/openfrontlabs" rel="noopener" aria-label="X, @openfrontlabs"><svg class="size-5" aria-hidden="true"><use href="#i-x"/></svg></a></li>
 </ul>
 </div>
 </footer>

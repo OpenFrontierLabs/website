@@ -18,7 +18,7 @@ describe("dist", () => {
   });
 
   test("required sections exist", () => {
-    for (const id of ["top", "main", "manifesto", "pillars", "how", "roadmap", "join"]) {
+    for (const id of ["top", "main", "mission", "how", "platform", "community", "research", "network", "join"]) {
       expect(index).toContain(`id="${id}"`);
     }
   });
@@ -65,17 +65,23 @@ describe("dist", () => {
   });
 
   test("html + css + fonts within raw size budget; images are separate", () => {
-    expect(statSync(join(dist, "index.html")).size).toBeLessThan(40_000);
+    expect(statSync(join(dist, "index.html")).size).toBeLessThan(60_000);
     const code = readdirSync(join(dist, "assets"))
       .filter((f) => /\.(css|woff2)$/.test(f))
       .reduce((n, f) => n + statSync(join(dist, "assets", f)).size, 0);
-    expect(code + statSync(join(dist, "index.html")).size).toBeLessThan(130_000);
+    expect(code + statSync(join(dist, "index.html")).size).toBeLessThan(150_000);
   });
 
-  test("every hero-critical image is AVIF-first with a PNG fallback", () => {
-    expect(index).toMatch(/<source srcset="\/assets\/mark-448-\w+\.avif" type="image\/avif">/);
-    expect(index).toMatch(/<img src="\/assets\/mark-448-\w+\.png"/);
-    expect(index).toMatch(/rel="preload" as="image" href="\/assets\/mark-448-\w+\.avif"/);
+  test("hero art is AVIF-first with a PNG fallback and preloaded", () => {
+    expect(index).toMatch(/<source srcset="\/assets\/arc-hero-\w+\.avif" type="image\/avif">/);
+    expect(index).toMatch(/<img src="\/assets\/arc-hero-\w+\.png"/);
+    expect(index).toMatch(/rel="preload" as="image" href="\/assets\/arc-hero-\w+\.avif"/);
+  });
+
+  test("no invented numbers from the mockup", () => {
+    for (const fake of ["18,400", "420K", "1,200+", "380+"]) expect(index).not.toContain(fake);
+    expect(index).toContain("The network starts with you. Run 0 opens soon.");
+    expect(index).not.toContain("%GH_");
   });
 
   test("og.png is 1200x630", () => {

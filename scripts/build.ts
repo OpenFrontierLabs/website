@@ -38,6 +38,27 @@ const withArt = (html: string) =>
     return url;
   });
 
+// Real numbers only: GitHub stars and contributors, fetched at build time; 0 when unreachable.
+async function github(path: string): Promise<Response | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/OpenFrontierLabs/openfrontier${path}`, {
+      headers: { accept: "application/vnd.github+json", "user-agent": "ofl-website-build" },
+      signal: AbortSignal.timeout(8000),
+    });
+    return res.ok ? res : null;
+  } catch {
+    return null;
+  }
+}
+const repo = (await (await github(""))?.json()) as { stargazers_count?: number } | undefined;
+const contributorsRes = await github("/contributors?per_page=1&anon=1");
+const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes?.headers.get("link") ?? "")?.[1];
+const contributorList = contributorsRes ? ((await contributorsRes.json()) as unknown[]) : [];
+const stats = {
+  "%GH_STARS%": String(repo?.stargazers_count ?? 0),
+  "%GH_CONTRIBUTORS%": lastPage ?? String(contributorList.length),
+};
+
 const tw = Bun.spawnSync(
   [join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/styles.css"), "--minify"],
   { cwd: root, stdout: "pipe", stderr: "inherit" },
@@ -54,6 +75,6 @@ for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith("
     .replaceAll("%CSS%", `/assets/${cssName}`)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);
-  await writeFile(join(dist, file), withArt(html));
+  await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
 }
 console.log(`built dist: ${cssName}, ${fontName}`);
