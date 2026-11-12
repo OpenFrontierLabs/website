@@ -10,7 +10,7 @@ make check    # build, typecheck, lint, tests
 make release  # build, apply D1 migrations remotely, wrangler deploy
 ```
 
-Secrets (`wrangler secret put`): `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`; `GITHUB_CLIENT_ID` goes in `[vars]`. Until both GitHub values exist, `/auth/github` answers 503. Local `.dev.vars` needs those two plus `APP_ORIGIN=http://localhost:<port>`. Operators are active admins of the OpenFrontierLabs org, or the logins in `ADMIN_GITHUB_LOGINS`.
+Secrets (`wrangler secret put`): `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`; `GITHUB_CLIENT_ID` goes in `[vars]`. Until both GitHub values exist, `/auth/github` answers 503. Local `.dev.vars` needs `SESSION_SECRET` and `APP_ORIGIN=http://localhost:<port>`. Operators are active admins of the OpenFrontierLabs org, or the logins in `ADMIN_GITHUB_LOGINS`.
 
 Brand tokens (`src/styles.css`): Frontier Green `#66E36E`, Compute Green `#1B7F46`, Graphite `#0B0E0D`, Silver Gray `#6B7177` (decor only; body text uses the lighter `#A1A8AD` for AA contrast), Soft White `#F5F7F6`. Font: Inter variable, self-hosted.
 

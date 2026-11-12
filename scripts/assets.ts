@@ -18,11 +18,11 @@ async function transparent(file: string, size: number): Promise<Buffer> {
   const { data, info } = await sharp(src(file)).resize(size, size).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   for (let i = 0; i < data.length; i += 4) {
     const a = Math.max(data[i]!, data[i + 1]!, data[i + 2]!);
+    data[i + 3] = a;
     if (a === 0) continue;
     data[i] = Math.min(255, Math.round((data[i]! * 255) / a));
     data[i + 1] = Math.min(255, Math.round((data[i + 1]! * 255) / a));
     data[i + 2] = Math.min(255, Math.round((data[i + 2]! * 255) / a));
-    data[i + 3] = a;
   }
   return sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
 }
@@ -42,8 +42,8 @@ const trimmed = await sharp(hex).trim({ threshold: 4 }).toBuffer({ resolveWithOb
 const square = (buf: Buffer, size: number, pad = 0) =>
   sharp(buf).resize(size - pad * 2, size - pad * 2, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } });
-const arcLogo = await transparent("arc-logo-1024.png", 1024);
-await emit("arc-160", square(arcLogo, 160));
+const arcLogo = await sharp(await transparent("arc-logo-1024.png", 1024)).trim({ threshold: 6 }).toBuffer();
+await emit("arc-160", sharp(arcLogo).resize({ width: 160 }));
 // Hero arc stays opaque (blended with mix-blend-mode: screen on the page): its black is not pure black.
 const arcBox = await sharp(src("arc-logo-1024.png")).trim({ background: "#000", threshold: 24 }).toBuffer({ resolveWithObject: true });
 const pad = 24;
@@ -73,11 +73,12 @@ const og = await sharp({ create: { width: 1200, height: 630, channels: 3, backgr
   .toBuffer();
 await writeFile(join(pub, "og.png"), og);
 
-// Icons from the transparent mark.
-const icon = (size: number, pad: number) => square(trimmed.data, size, pad).png({ palette: true, quality: 90, effort: 10 }).toBuffer();
+// Icons: the transparent mark on an opaque black tile, so it reads the same on light and dark browser chrome.
+const icon = async (size: number, pad: number) =>
+  sharp(await square(trimmed.data, size, pad).png().toBuffer()).flatten({ background: "#000" }).png({ palette: true, quality: 90, effort: 10 }).toBuffer();
 await writeFile(join(pub, "icon-192.png"), await icon(192, 16));
 await writeFile(join(pub, "icon-512.png"), await icon(512, 40));
-await writeFile(join(pub, "apple-touch-icon.png"), await sharp(await icon(180, 20)).flatten({ background: "#000" }).png().toBuffer());
+await writeFile(join(pub, "apple-touch-icon.png"), await icon(180, 20));
 await writeFile(join(pub, "favicon-32.png"), await icon(32, 1));
 
 // PNG-in-ICO: 16, 32, 48.

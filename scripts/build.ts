@@ -38,40 +38,47 @@ const withArt = (html: string) =>
     return url;
   });
 
-// Real numbers only: GitHub stars and contributors, fetched at build time; 0 when unreachable.
-async function github(path: string): Promise<Response | null> {
-  try {
-    const res = await fetch(`https://api.github.com/repos/OpenFrontierLabs/openfrontier${path}`, {
-      headers: { accept: "application/vnd.github+json", "user-agent": "ofl-website-build" },
-      signal: AbortSignal.timeout(8000),
-    });
-    return res.ok ? res : null;
-  } catch {
-    return null;
-  }
+// Real numbers only: the contributor count is read from GitHub at build time, and the build fails
+// rather than publish a made-up 0 when GitHub is unreachable or rate-limited.
+// GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
+const token = process.env.GITHUB_TOKEN;
+const contributorsRes = await fetch("https://api.github.com/repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1", {
+  headers: {
+    accept: "application/vnd.github+json",
+    "user-agent": "ofl-website-build",
+    ...(token ? { authorization: `Bearer ${token}` } : {}),
+  },
+  signal: AbortSignal.timeout(8000),
+});
+if (!contributorsRes.ok) {
+  throw new Error(`GitHub contributors: HTTP ${contributorsRes.status}. Set GITHUB_TOKEN (env) and rebuild.`);
 }
-const repo = (await (await github(""))?.json()) as { stargazers_count?: number } | undefined;
-const contributorsRes = await github("/contributors?per_page=1&anon=1");
-const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes?.headers.get("link") ?? "")?.[1];
-const contributorList = contributorsRes ? ((await contributorsRes.json()) as unknown[]) : [];
+const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
 const stats = {
-  "%GH_STARS%": String(repo?.stargazers_count ?? 0),
-  "%GH_CONTRIBUTORS%": lastPage ?? String(contributorList.length),
+  "%GH_CONTRIBUTORS%": lastPage ?? String(((await contributorsRes.json()) as unknown[]).length),
 };
 
-// The manifesto is rendered from content/manifesto.md verbatim: paragraphs and **bold** only.
-const escape = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-const [titleLine, ...paragraphs] = (await readFile(join(root, "content/manifesto.md"), "utf8")).trim().split(/\n\s*\n/);
-if (!titleLine?.startsWith("# ")) throw new Error("content/manifesto.md must start with a # title");
-const manifesto = {
-  "%MANIFESTO_TITLE%": escape(titleLine.slice(2)),
-  "%MANIFESTO%": paragraphs
-    .map((p) => {
-      const html = escape(p.replace(/\s*\n\s*/g, " ")).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-      return /^\*\*[^*]+\*\*$/.test(p) ? `<p class="m-coda">${html}</p>` : `<p>${html}</p>`;
-    })
-    .join("\n"),
-};
+// The manifesto has one source, content/manifesto.md (identical to MANIFESTO.md in OpenFrontierLabs/openfrontier).
+// Principles (a paragraph that opens in bold) and the bold tagline get classes for styling; the words are untouched.
+const manifestoHtml = Bun.markdown.html(await readFile(join(root, "content/manifesto.md"), "utf8"));
+const manifestoTitle = /<h1>(.+?)<\/h1>/.exec(manifestoHtml)?.[1];
+if (!manifestoTitle) throw new Error("content/manifesto.md needs a # title");
+const manifesto = manifestoHtml
+  .replace(/<h1>.+?<\/h1>\n?/, "")
+  .replace(/<p><strong>([^<]+)<\/strong><\/p>/g, '<p class="m-tag"><strong>$1</strong></p>')
+  .replaceAll("<p><strong>", '<p class="m-principle"><strong>');
+
+// Shared markup (icon sprite, nav, footer) lives in src/partials and is inlined as <!--#partial name-->.
+const partials = new Map<string, string>();
+for (const file of await readdir(join(root, "src/partials"))) {
+  partials.set(file.replace(/\.html$/, ""), (await readFile(join(root, "src/partials", file), "utf8")).trimEnd());
+}
+const withPartials = (html: string) =>
+  html.replace(/<!--#partial ([\w-]+)-->/g, (_, name: string) => {
+    const part = partials.get(name);
+    if (part === undefined) throw new Error(`unknown partial ${name}`);
+    return part;
+  });
 
 const tw = Bun.spawnSync(
   [join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/styles.css"), "--minify"],
@@ -85,12 +92,13 @@ const cssName = `app-${hash(css)}.css`;
 await writeFile(join(dist, "assets", cssName), css);
 
 for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith(".html"))) {
-  const html = (await readFile(join(root, "src", file), "utf8"))
+  const html = withPartials(await readFile(join(root, "src", file), "utf8"))
+    .replaceAll("%MANIFESTO_TITLE%", manifestoTitle)
+    .replaceAll("%MANIFESTO%", manifesto)
     .replaceAll("%CSS%", `/assets/${cssName}`)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);
-  const filled = Object.entries({ ...stats, ...manifesto }).reduce((h, [k, v]) => h.replaceAll(k, v), html);
-  await writeFile(join(dist, file), withArt(filled));
+  await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
 }
 // The Worker renders its own pages (/join, /console, /admin) with the same hashed assets.
 const workerAssets = { css: `/assets/${cssName}`, font: `/assets/${fontName}`, logoWebp: art.get("arc-160.webp"), logoPng: art.get("arc-160.png") };
