@@ -38,24 +38,56 @@ const withArt = (html: string) =>
     return url;
   });
 
-// Real numbers only: the contributor count is read from GitHub at build time, and the build fails
-// rather than publish a made-up 0 when GitHub is unreachable or rate-limited.
-// GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
+// Real numbers only: the contributor count and the dashboard's activity feed are read from GitHub at
+// build time, and the build fails rather than publish a made-up 0 or an empty feed when GitHub is
+// unreachable or rate-limited. GITHUB_TOKEN (optional, env only) lifts the anonymous rate limit.
 const token = process.env.GITHUB_TOKEN;
-const contributorsRes = await fetch("https://api.github.com/repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1", {
-  headers: {
-    accept: "application/vnd.github+json",
-    "user-agent": "ofl-website-build",
-    ...(token ? { authorization: `Bearer ${token}` } : {}),
-  },
-  signal: AbortSignal.timeout(8000),
-});
-if (!contributorsRes.ok) {
-  throw new Error(`GitHub contributors: HTTP ${contributorsRes.status}. Set GITHUB_TOKEN (env) and rebuild.`);
+async function github(path: string): Promise<Response> {
+  const res = await fetch(`https://api.github.com/${path}`, {
+    headers: {
+      accept: "application/vnd.github+json",
+      "user-agent": "ofl-website-build",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`GitHub ${path}: HTTP ${res.status}. Set GITHUB_TOKEN (env) and rebuild.`);
+  return res;
 }
+const contributorsRes = await github("repos/OpenFrontierLabs/openfrontier/contributors?per_page=1&anon=1");
 const lastPage = /[?&]page=(\d+)>; rel="last"/.exec(contributorsRes.headers.get("link") ?? "")?.[1];
+
+// Recent activity: the latest merged pull requests across the organisation's repositories.
+interface Pull {
+  number: number;
+  title: string;
+  html_url: string;
+  merged_at: string | null;
+}
+const escapeHtml = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+const merged = (
+  await Promise.all(
+    ["openfrontier", "website", ".github"].map(async (repo) => {
+      const pulls = (await (await github(`repos/OpenFrontierLabs/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`)).json()) as Pull[];
+      return pulls.filter((p) => p.merged_at !== null).map((p) => ({ ...p, repo, mergedAt: p.merged_at! }));
+    }),
+  )
+)
+  .flat()
+  .sort((a, b) => b.mergedAt.localeCompare(a.mergedAt))
+  .slice(0, 6);
+if (merged.length === 0) throw new Error("GitHub returned no merged pull requests for the activity feed");
+const activity = merged
+  .map((p) => {
+    const title = escapeHtml(p.title.replace(/\s*\((?:Agent|agent):[^)]*\)\s*$/u, ""));
+    const day = new Date(p.mergedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+    return `<li><svg class="act-ico" aria-hidden="true"><use href="#i-check"/></svg><a href="${p.html_url}" rel="noopener"><b>${title}</b><span>Merged in ${escapeHtml(p.repo)} #${p.number}</span></a><time datetime="${p.mergedAt}">${day}</time></li>`;
+  })
+  .join("\n");
+
 const stats = {
   "%GH_CONTRIBUTORS%": lastPage ?? String(((await contributorsRes.json()) as unknown[]).length),
+  "%ACTIVITY%": activity,
 };
 
 // The manifesto has one source, content/manifesto.md (identical to MANIFESTO.md in OpenFrontierLabs/openfrontier).
@@ -91,11 +123,19 @@ const css = tw.stdout.toString()
 const cssName = `app-${hash(css)}.css`;
 await writeFile(join(dist, "assets", cssName), css);
 
+// The dashboard's own styles ship only with /dashboard, so the home page doesn't carry them.
+const dashTw = Bun.spawnSync([join(root, "node_modules/.bin/tailwindcss"), "-i", join(root, "src/dashboard.css"), "--minify"], { cwd: root, stdout: "pipe", stderr: "inherit" });
+if (dashTw.exitCode !== 0) throw new Error("tailwindcss failed on src/dashboard.css");
+const dashCss = dashTw.stdout.toString();
+const dashCssName = `dash-${hash(dashCss)}.css`;
+await writeFile(join(dist, "assets", dashCssName), dashCss);
+
 for (const file of (await readdir(join(root, "src"))).filter((f) => f.endsWith(".html"))) {
   const html = withPartials(await readFile(join(root, "src", file), "utf8"))
     .replaceAll("%MANIFESTO_TITLE%", manifestoTitle)
     .replaceAll("%MANIFESTO%", manifesto)
     .replaceAll("%CSS%", `/assets/${cssName}`)
+    .replaceAll("%DASH_CSS%", `/assets/${dashCssName}`)
     .replaceAll("%FONT%", `/assets/${fontName}`)
     .replaceAll("%DISPLAY%", `/assets/${displayName}`);
   await writeFile(join(dist, file), withArt(Object.entries(stats).reduce((h, [k, v]) => h.replaceAll(k, v), html)));
