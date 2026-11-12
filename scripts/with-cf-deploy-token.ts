@@ -79,18 +79,25 @@ console.error(`cf deploy token ${id} minted for ${requestIps.length} egress addr
 
 let code = 1;
 try {
-  // A new token's permissions apply per product, seconds apart: wait until both D1 (the migrations run
-  // first) and Workers answer, or the release fails with "Authentication error [code: 10000]".
-  const probes = [`accounts/${ACCOUNT_ID}/d1/database?per_page=1`, `accounts/${ACCOUNT_ID}/workers/scripts`];
-  let effective = false;
-  for (let attempt = 0; attempt < 30 && !effective; attempt += 1) {
+  // A new token's permissions reach Cloudflare's API nodes per product and per node, seconds apart. One
+  // good answer is not enough (a release still hit "Authentication error [code: 10000]" right after one):
+  // wait until every scope the release uses answers on three consecutive rounds.
+  const probes = [
+    `accounts/${ACCOUNT_ID}`,
+    `accounts/${ACCOUNT_ID}/d1/database?per_page=1`,
+    `accounts/${ACCOUNT_ID}/workers/scripts`,
+    `zones/${ZONE_ID}`,
+    `zones/${ZONE_ID}/workers/routes`,
+  ];
+  let streak = 0;
+  for (let attempt = 0; attempt < 45 && streak < 3; attempt += 1) {
     const answers = await Promise.all(
       probes.map((path) => fetch(`https://api.cloudflare.com/client/v4/${path}`, { headers: { authorization: `Bearer ${value}` }, signal: AbortSignal.timeout(10_000) })),
     );
-    effective = answers.every((res) => res.ok);
-    if (!effective) await Bun.sleep(2000);
+    streak = answers.every((res) => res.ok) ? streak + 1 : 0;
+    await Bun.sleep(2000);
   }
-  if (!effective) throw new Error("the minted Cloudflare token never became effective for D1 and Workers");
+  if (streak < 3) throw new Error("the minted Cloudflare token never became effective for every release scope");
 
   const [program = "", ...args] = command;
   const child = spawn(program, args, { stdio: "inherit", env: { ...process.env, CLOUDFLARE_API_TOKEN: value, CLOUDFLARE_ACCOUNT_ID: ACCOUNT_ID } });
