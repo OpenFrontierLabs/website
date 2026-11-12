@@ -78,6 +78,7 @@ describe("dist", () => {
     expect(index).toContain("openfrontierlabs@gmail.com");
     expect(index).toContain("https://github.com/OpenFrontierLabs/openfrontier");
     expect(index).toContain("https://x.com/openfrontlabs");
+    expect(index).toContain("https://discord.gg/M4sD8T5M8D");
     expect(index).toContain("subject=Donate%20compute%20to%20Open%20Frontier%20Labs");
   });
 
