@@ -2,10 +2,12 @@
 // selection, tabs and filters are links; charts are SVG drawn on the server from real values.
 import { ASSET } from "./assets.gen";
 import type { AuditRow, UserRow } from "./db";
-import { brandPicture, documentHtml, esc, type Viewer } from "./html";
+import { esc } from "./esc";
+import { brandPicture, documentHtml, type Viewer } from "./html";
 import { DOCS_URL } from "./program";
 import { DISCORD_URL } from "./starter";
 import type { Answers } from "./questionnaire";
+import type { MemberSwarm } from "./swarm";
 
 /** Everything a workspace page can show: the person's own row and answers, plus where they stand. */
 export interface WorkspaceData {
@@ -16,6 +18,7 @@ export interface WorkspaceData {
   position: number;
   waiting: number;
   events: AuditRow[];
+  swarm: MemberSwarm;
   now: Date;
 }
 
@@ -137,6 +140,12 @@ export interface Head {
   actions: string;
 }
 
+function net(d: WorkspaceData): string {
+  const online = d.swarm.nodes.filter((n) => n.online).length;
+  const note = d.swarm.nodes.length === 0 ? "Join with ofl node join" : `${d.swarm.nodes.length} registered`;
+  return `<div class="ws-net" role="status"><i aria-hidden="true"></i><span><b>${online === 0 ? "No node online" : `${online} ${online === 1 ? "node" : "nodes"} online`}</b><small>${note}</small></span></div>`;
+}
+
 function side(d: WorkspaceData, current: string): string {
   const link = (n: NavItem) =>
     `<a href="${n.href}"${n.href === current ? ' aria-current="page"' : ""}>${icon(n.icon)}<span>${esc(n.label)}</span></a>`;
@@ -155,7 +164,7 @@ ${ext(DISCORD_URL, "Community", "w-people")}
 ${ext(DOCS_URL, "Documentation", "w-book")}
 ${link(SETTINGS)}
 </nav>
-<div class="ws-net" role="status"><i aria-hidden="true"></i><span><b>Run 0 is forming</b><small>No node connected · Node app planned</small></span></div>
+${net(d)}
 <a class="ws-me" href="/console/profile"><span class="ws-avatar">${avatar}</span><span><b>${esc(d.answers.displayName || d.v.login)}</b><small>@${esc(d.v.login)} · ${esc(standing)}</small></span></a>
 </aside>`;
 }
@@ -181,7 +190,7 @@ ${top(d, head.title)}
 <main id="main" class="ws-main">
 <header class="ws-head"><div><p class="ws-eyebrow">${esc(head.eyebrow)}</p><h1>${esc(head.title)}</h1><p>${esc(head.lede)}</p></div><div class="ws-actions">${head.actions}</div></header>
 ${body}
-<p class="ws-foot">Live data: your sign-up from our database, the program from the openfrontier repository. A zero is a real zero; Run 0 has not started.</p>
+<p class="ws-foot">Live data: your sign-up and your nodes from our database, the program from the openfrontier repository. A zero is a real zero; Run 0 has not started.</p>
 </main>
 </div>
 </div>`,

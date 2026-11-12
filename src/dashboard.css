@@ -562,6 +562,131 @@
     color: var(--color-frontier);
   }
 
+  /* swarm run: progress, loss chart, participants */
+  .run-wide {
+    flex: none;
+    width: 100%;
+  }
+  .run-prog {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .run-prog progress {
+    flex: 1;
+    height: 0.55rem;
+    appearance: none;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.07);
+  }
+  .run-prog progress::-webkit-progress-bar {
+    background: rgb(255 255 255 / 0.07);
+  }
+  .run-prog progress::-webkit-progress-value {
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2fa84f, var(--color-frontier));
+  }
+  .run-prog progress::-moz-progress-bar {
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2fa84f, var(--color-frontier));
+  }
+  .run-prog b {
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .vl {
+    margin-top: 0.9rem;
+  }
+  .vl svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .vl-grid line {
+    stroke: rgb(255 255 255 / 0.08);
+  }
+  .vl-grid text {
+    fill: #7d858b;
+    font-size: 10px;
+  }
+  .vl-line {
+    fill: none;
+    stroke: var(--color-frontier);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 4px rgb(102 227 110 / 0.5));
+  }
+  .vl-area {
+    fill: rgb(102 227 110 / 0.08);
+  }
+  .vl-dot {
+    fill: #c8ffcb;
+  }
+  .vl figcaption {
+    margin-top: 0.3rem;
+    color: #7d858b;
+    font-size: 0.72rem;
+  }
+  .run-nodes {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+  }
+  .run-nodes li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+    border: 1px solid rgb(255 255 255 / 0.07);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.7rem;
+  }
+  .run-nodes i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: #4a5258;
+  }
+  .run-nodes i.pn-on {
+    background: var(--color-frontier);
+    box-shadow: 0 0 8px var(--color-frontier);
+  }
+  .run-nodes b {
+    display: block;
+    overflow: hidden;
+    font-size: 0.82rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .run-nodes small,
+  .run-nodes em {
+    color: #7d858b;
+    font-size: 0.72rem;
+    font-style: normal;
+  }
+  .run-hash {
+    margin-top: 0.9rem;
+    color: var(--color-mist);
+    font-size: 0.76rem;
+    overflow-wrap: anywhere;
+  }
+  .run-hash span {
+    margin-right: 0.35rem;
+    color: var(--color-frontier);
+  }
+  .run-hash code,
+  .util-note code,
+  .mine-note code {
+    font-family: ui-monospace, monospace;
+  }
+  .util-legend small {
+    color: #7d858b;
+    font-weight: 400;
+  }
+
   /* your contribution */
   .dcard-mine {
     grid-area: mine;

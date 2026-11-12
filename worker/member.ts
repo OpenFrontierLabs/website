@@ -1,6 +1,7 @@
 // /join and the questionnaire form (first time here, and in workspace Settings).
 import type { UserRow } from "./db";
-import { esc, page, type Viewer } from "./html";
+import { esc } from "./esc";
+import { page, type Viewer } from "./html";
 import { CONTRIBUTIONS, EXPERIENCE, HARDWARE, type Answers } from "./questionnaire";
 import { DISCORD_URL } from "./starter";
 

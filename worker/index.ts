@@ -2,9 +2,12 @@
 // the signed-in workspace (/console) and the Operator Console (/admin). Everything else is assets.
 import * as db from "./db";
 import { exchangeCode, fetchProfile, isOperator, SCOPE } from "./github";
+import { esc } from "./esc";
 import { html, SECURITY_HEADERS, toGitHub, type Viewer } from "./html";
 import * as member from "./member";
 import * as operator from "./operator";
+import * as swarm from "./swarm";
+import * as swarmView from "./swarm-view";
 import * as pages from "./workspace-pages";
 import type { WorkspaceData } from "./workspace";
 import { validateAnswers, type Answers } from "./questionnaire";
@@ -19,6 +22,8 @@ interface Env {
   GITHUB_CLIENT_SECRET?: string;
   SESSION_SECRET: string;
   ADMIN_GITHUB_LOGINS: string;
+  /** Bearer token of the swarm coordinator. Unset until `wrangler secret put SWARM_INGEST_TOKEN`; ingest then fails closed with 503. */
+  SWARM_INGEST_TOKEN?: string;
 }
 
 const SESSION = "__Host-ofl_session";
@@ -50,7 +55,9 @@ async function landing(c: Ctx, user: db.UserRow, setCookies: string[] = [], than
 }
 
 async function workspaceData(c: Ctx, user: db.UserRow, answers: Answers): Promise<WorkspaceData> {
-  return { v: viewerOf(user), user, answers, ...(await db.standing(c.env.DB, user)), now: new Date() };
+  const now = new Date();
+  const [standing, memberSwarm] = await Promise.all([db.standing(c.env.DB, user), swarm.memberSwarm(c.env.DB, user.login, now)]);
+  return { v: viewerOf(user), user, answers, ...standing, swarm: memberSwarm, now };
 }
 
 async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
@@ -71,6 +78,55 @@ async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   }
   const value = count;
   return new HTMLRewriter().on("[data-waitlist]", { element: (el) => void el.setInnerContent(`, ${value} on the waitlist`) }).transform(res);
+}
+
+const json = (body: unknown, status = 200, cache = "no-store") =>
+  new Response(JSON.stringify(body), { status, headers: { ...SECURITY_HEADERS, "content-type": "application/json; charset=utf-8", "cache-control": cache } });
+
+/** Constant-time bearer check: both sides are hashed first so the comparison never depends on length. */
+async function bearerMatches(header: string | null, secret: string): Promise<boolean> {
+  const digest = async (v: string) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(v));
+  const given = header?.startsWith("Bearer ") ? header.slice(7) : "";
+  return crypto.subtle.timingSafeEqual(await digest(given), await digest(secret));
+}
+
+async function swarmIngest(c: Ctx): Promise<Response> {
+  if (!c.env.SWARM_INGEST_TOKEN) return json({ error: "swarm ingest is not configured" }, 503);
+  if (!(await bearerMatches(c.req.headers.get("authorization"), c.env.SWARM_INGEST_TOKEN))) return json({ error: "unauthorized" }, 401);
+  let report;
+  try {
+    report = swarm.parseReport(await c.req.json(), Date.now());
+  } catch (err) {
+    if (err instanceof swarm.BadReport || err instanceof SyntaxError) return json({ error: err.message }, 400);
+    throw err;
+  }
+  await swarm.ingest(c.env.DB, report);
+  return json({ ok: true });
+}
+
+/** The dashboard is a static asset whose swarm blocks are filled from D1 on each view; without data (or if D1 fails) the static zeros stand. */
+async function dashboard(c: Ctx): Promise<Response> {
+  const res = await c.env.ASSETS.fetch(c.req);
+  if (!res.ok || !(res.headers.get("content-type") ?? "").includes("text/html")) return res;
+  let s: swarm.Summary;
+  try {
+    s = await swarm.summary(c.env.DB);
+  } catch (err) {
+    console.error(err);
+    return res;
+  }
+  const inner = (html: string) => ({ element: (el: Element) => void el.setInnerContent(html, { html: true }) });
+  const rewriter = new HTMLRewriter()
+    .on('li[data-swarm="nodes"]', { element: (el) => void el.replace(swarmView.nodesStat(s), { html: true }) })
+    .on('li[data-swarm="runs"]', { element: (el) => void el.replace(swarmView.runsStat(s), { html: true }) })
+    .on('section[data-swarm="util"]', inner(swarmView.devicesCard(s)))
+    .on('section[data-swarm="mine"]', inner(swarmView.computeCard(s)))
+    .on('ul[data-swarm="map"]', inner(swarmView.mapStats(s)))
+    .on('p[data-swarm="mapnote"]', inner(esc(swarmView.mapNote(s))));
+  if (s.latest_run) rewriter.on('section[data-swarm="run"]', inner(swarmView.runCard(s)));
+  const out = new Response(rewriter.transform(res).body, res);
+  out.headers.set("cache-control", "public, max-age=10");
+  return out;
 }
 
 async function startOAuth(c: Ctx): Promise<Response> {
@@ -187,6 +243,9 @@ const sameOrigin = (req: Request, url: URL) => {
 
 async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   const { pathname } = c.url;
+  if (pathname === "/v1/swarm/ingest") return c.req.method === "POST" ? swarmIngest(c) : text("Method not allowed", 405);
+  if (pathname === "/v1/swarm") return c.req.method === "GET" ? json(await swarm.summary(c.env.DB), 200, "public, max-age=5") : text("Method not allowed", 405);
+  if (pathname === "/dashboard") return dashboard(c);
   if (c.req.method === "POST" && !sameOrigin(c.req, c.url)) return text("Cross-origin request refused", 403);
   if (pathname === "/") return home(c, ctx);
   if (pathname === "/auth/github") return startOAuth(c);

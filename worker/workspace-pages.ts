@@ -1,14 +1,15 @@
 // The workspace pages. Every number is either the person's own data (sign-up, answers, status
 // history) or a real zero from a program that has not trained anything yet.
-import { esc } from "./html";
+import { esc } from "./esc";
 import { DATASETS, DATASETS_URL, JOIN_NODE_URL, LEDGER_NOTE, MODELS, RUN0_READINESS, RUN0_URL, RUNS, STAGE_LABEL, WEIGHTS_LICENCE, DOCS_URL } from "./program";
 import { answersList, questionnaireForm } from "./member";
 import { DISCORD_URL, pathsFor } from "./starter";
 import { CONTRIBUTIONS, declaredDevices, deviceTotal, vendorMix, type Answers, type Device, type HardwareKind } from "./questionnaire";
+import { duration, memberRunTable, nodeCommand, nodeTable, onlineCount, totalRounds, totalSeconds } from "./swarm-view";
 import { ago, badge, dailyChart, donut, icon, kpis, more, panel, progress, workspacePage, type WorkspaceData } from "./workspace";
 
-const zeros = () => Array.from({ length: 30 }, () => 0);
-const NO_COMPUTE = "No compute recorded yet. The ledger opens with Run 0.";
+const NO_COMPUTE = "No compute recorded yet. Run ofl node join to add some.";
+const minutes = (d: WorkspaceData) => d.swarm.daily_seconds.map((s) => Math.round(s / 6) / 10);
 
 const primary = (href: string, label: string, id = "w-plus") =>
   `<a class="btn btn-primary btn-sm" href="${href}"${href.startsWith("http") ? ' rel="noopener"' : ""}>${icon(id, "size-4")}<span>${esc(label)}</span></a>`;
@@ -95,21 +96,21 @@ export function overview(d: WorkspaceData, thanks = false): string {
     {
       eyebrow: "Personal workspace",
       title: "Overview",
-      lede: "Your compute, training assignments and published evidence, live. Run 0 has not started, so most of this is still zero.",
+      lede: "Your compute, training assignments and published evidence, live. Your nodes and their rounds come from the swarm proof of concept; Run 0 has not started.",
       actions: `${secondary(DISCORD_URL, "Join the Discord")}${primary(RUN0_URL, "Try Run 0 yourself", "w-play")}`,
     },
     `${thanks ? '<p class="app-ok" role="status">Thank you for joining. Your answers are saved.</p>' : ""}${kpis([
-      { label: "Verified compute", value: "0 h", note: "GPU-equivalent total", href: "/console/contributions" },
-      { label: "Connected nodes", value: "0", note: `${deviceTotal(devices)} declared at sign-up`, href: "/console/nodes" },
-      { label: "Training runs", value: "0", note: "Participated in", flag: "Run 0 forming", href: "/console/runs" },
+      { label: "Node compute", value: duration(totalSeconds(d.swarm)), note: "Training time on your nodes", href: "/console/contributions" },
+      { label: "Online nodes", value: String(onlineCount(d.swarm)), note: `${d.swarm.nodes.length} registered · ${deviceTotal(devices)} declared`, href: "/console/nodes" },
+      { label: "Training runs", value: String(d.swarm.runs.length), note: "Your nodes took part in", href: "/console/runs" },
       { label: "Your place", value: s.value, note: s.note },
     ])}
 <div class="ws-grid ws-grid-main">
-${panel("Contribution over time", '<span class="ws-tag">Last 30 days</span>', `<p class="ws-big"><b>0</b> GPU·h <span>no prior period to compare</span></p>${dailyChart(zeros(), d.now, "GPU hours", NO_COMPUTE)}`)}
+${panel("Contribution over time", '<span class="ws-tag">Last 30 days</span>', `<p class="ws-big"><b>${duration(totalSeconds(d.swarm))}</b> node time <span>all time</span></p>${dailyChart(minutes(d), d.now, "Node minutes", NO_COMPUTE)}`)}
 ${assignment(d)}
 </div>
 <div class="ws-grid ws-grid-even">
-${panel("Your compute nodes", more("/console/nodes", "Manage nodes"), deviceRows(devices, d.answers))}
+${panel("Your compute nodes", more("/console/nodes", "Manage nodes"), d.swarm.nodes.length > 0 ? nodeTable(d.swarm.nodes, d.now.getTime()) : deviceRows(devices, d.answers))}
 ${panel("Recent activity", "", activity(d))}
 </div>
 ${starterIssues(d.answers)}`,
@@ -128,6 +129,13 @@ function starterIssues(a: Answers): string {
   );
 }
 
+function swarmRuns(d: WorkspaceData): string {
+  return (
+    memberRunTable(d.swarm.runs, d.swarm.nodes) ||
+    `<div class="ws-empty">${icon("w-play")}<p><b>No run yet.</b> Runs your nodes join appear here with rounds, validation loss and compute time. Start one with <code>${esc(nodeCommand(d.v.login))}</code>.</p></div>`
+  );
+}
+
 export function nodes(d: WorkspaceData, selectedKind: string | null): string {
   const devices = declaredDevices(d.answers);
   const sel = devices.find((x) => x.kind === selectedKind) ?? devices[0];
@@ -138,37 +146,37 @@ export function nodes(d: WorkspaceData, selectedKind: string | null): string {
         badge("Declared", "idle"),
         `<p class="ws-kicker">Selected device · declared at sign-up</p>
 <h3 class="ws-title">${sel.count} × ${esc(sel.label)}</h3>
-<p class="ws-sub">Not connected · the Node agent is not released yet</p>
-<div class="ws-pair"><div><p class="ws-kicker">Offered time</p><b>${hours === null ? "Not given" : `${hours} h / week`}</b></div><div><p class="ws-kicker">Session uptime</p><b>0 h</b></div></div>
-<h4 class="ws-h4">Resource utilization</h4>
-<div class="ws-row"><span>Compute load</span>${progress(0, "Compute load")}</div>
+<p class="ws-sub">Declared at sign-up. Machines you have joined are listed in the inventory.</p>
+<div class="ws-pair"><div><p class="ws-kicker">Offered time</p><b>${hours === null ? "Not given" : `${hours} h / week`}</b></div></div>
 <h4 class="ws-h4">Participation policy</h4>
 <dl class="ws-dl"><dt>Your hardware note</dt><dd>${d.answers.gpuDetails ? esc(d.answers.gpuDetails) : "Not given"}</dd><dt>Maximum compute load</dt><dd>Set in the Node app (planned)</dd><dt>Schedule</dt><dd>${hours === null ? "Not set" : `Up to ${hours} h a week`}</dd><dt>Checkpoint recovery</dt><dd>Planned with phase 3</dd></dl>
 <a class="ws-wide-btn" href="/console/profile">Edit declared hardware${icon("w-arr")}</a>`,
         "ws-detail",
       )
-    : panel("No device selected", "", `<div class="ws-empty">${icon("w-server")}<p>Declare your hardware in Settings and it appears here, ready to connect when the Node app ships.</p>${more("/console/profile", "Open Settings")}</div>`, "ws-detail");
+    : panel("No device selected", "", `<div class="ws-empty">${icon("w-server")}<p>Declare your hardware in Settings and it appears here, ready to connect with ofl node join.</p>${more("/console/profile", "Open Settings")}</div>`, "ws-detail");
   return workspacePage(
     d,
     "/console/nodes",
     {
       eyebrow: "Contributor infrastructure",
       title: "Compute nodes",
-      lede: "The hardware you offered, and its schedule. Machines connect through the Open Frontier Node app, which is planned; until then nothing runs on them.",
+      lede: "The hardware you offered, and its schedule. Machines join today with ofl node join, as a proof of concept over Tailscale; the Node app is planned.",
       actions: `${secondary(JOIN_NODE_URL, "Node guide")}${primary("/console/profile", "Add hardware")}`,
     },
     `${kpis([
-      { label: "Registered nodes", value: "0", note: "Node app planned" },
+      { label: "Registered nodes", value: String(d.swarm.nodes.length), note: d.swarm.nodes.length === 0 ? "Join with ofl node join" : `${onlineCount(d.swarm)} online now` },
       { label: "Declared devices", value: String(deviceTotal(devices)), note: devices.length ? devices.map((x) => x.label.split(" ")[0]).join(" · ") : "None declared" },
-      { label: "Compute utilization", value: "0%", note: "No device online" },
-      { label: "This week", value: "0 h", note: "GPU-equivalent hours" },
+      { label: "Online now", value: `${onlineCount(d.swarm)} of ${d.swarm.nodes.length}`, note: "Heartbeat in the last 2 minutes" },
+      { label: "Node compute", value: duration(totalSeconds(d.swarm)), note: `${totalRounds(d.swarm)} rounds trained` },
     ])}
 <div class="ws-grid ws-grid-even">
 ${panel(
   "Node inventory",
-  `<span class="ws-tag">${devices.length} declared</span>`,
-  `${deviceRows(devices, d.answers, sel?.kind)}
-<div class="ws-callout"><b>Check a machine today</b><p>The Node app is planned. You can already run <code>make doctor</code> from the openfrontier repository: it reports your GPU, CUDA, disk and network, with no GPU required.</p>${secondary(JOIN_NODE_URL, "Joining a node")}</div>`,
+  `<span class="ws-tag">${d.swarm.nodes.length} registered · ${devices.length} declared</span>`,
+  `${d.swarm.nodes.length > 0 ? nodeTable(d.swarm.nodes, d.now.getTime()) : `<div class="ws-empty">${icon("w-server")}<p><b>No node registered to @${esc(d.v.login)}.</b> Start a node with <code>${esc(nodeCommand(d.v.login))}</code>; it appears here within seconds.</p></div>`}
+<h4 class="ws-h4">Declared at sign-up</h4>
+${deviceRows(devices, d.answers, sel?.kind)}
+<div class="ws-callout"><b>Join a node today</b><p>Nodes join with <code>ofl node join</code> against a coordinator, as a proof of concept over Tailscale; the Node app is planned. <code>make doctor</code> in the openfrontier repository checks a machine first: GPU, CUDA, disk and network, no GPU required.</p>${secondary(JOIN_NODE_URL, "Joining a node")}</div>`,
 )}
 ${detail}
 </div>`,
@@ -195,17 +203,18 @@ export function runs(d: WorkspaceData): string {
     {
       eyebrow: "Distributed training",
       title: "Training runs",
-      lede: "Every planned run, in phase order, with what exists today. Nothing has been trained; Run 0 is the first and is scaffolded.",
+      lede: "Every planned run, in phase order, with what exists today. Run 0 is the first full-size run and is scaffolded; the swarm proof of concept below has trained a small model on real nodes.",
       actions: `${secondary(DOCS_URL, "Training docs")}${primary(RUN0_URL, "Try Run 0 yourself", "w-play")}`,
     },
     `${kpis([
-      { label: "Active assignments", value: "0", note: "Your devices contributing" },
-      { label: "Open runs", value: "0", note: "Run 0 forming" },
-      { label: "Verified updates", value: "0", note: "Verification planned" },
-      { label: "Participating peers", value: "0", note: "Across all runs" },
+      { label: "Active assignments", value: String(d.swarm.runs.filter((r) => r.status === "training").length), note: "Your nodes training now" },
+      { label: "Runs joined", value: String(d.swarm.runs.length), note: "Swarm proof of concept" },
+      { label: "Updates pushed", value: String(totalRounds(d.swarm)), note: "Rounds from your nodes" },
+      { label: "Peers in latest run", value: String(d.swarm.runs[0]?.peers ?? 0), note: "Nodes, yours included" },
     ])}
+${panel("Swarm runs you joined", '<span class="ws-tag">Proof of concept</span>', swarmRuns(d))}
 <div class="ws-grid ws-grid-main">
-${panel("Program", '<span class="ws-tag">Phase order</span>', `<ol class="ws-phases">${phases}</ol><p class="ws-note">Single-node runs come first. Joining a DiLoCo island is phase 3 and is not built.</p>`)}
+${panel("Program", '<span class="ws-tag">Phase order</span>', `<ol class="ws-phases">${phases}</ol><p class="ws-note">Single-node runs come first. The swarm proof of concept (DiLoCo over Tailscale, a small model) runs today; the real phase 3 is not built.</p>`)}
 ${panel("Run 0 readiness", badge(`${done} of ${RUN0_READINESS.length}`, "warn"), `<ul class="ws-checks">${readiness}</ul><a class="ws-wide-btn" href="${RUN0_URL}" rel="noopener">Read the Run 0 plan${icon("w-ext")}</a>`)}
 </div>
 ${panel("Explore training runs", '<span class="ws-tag">All phases</span>', table)}`,
@@ -255,17 +264,17 @@ export function contributions(d: WorkspaceData): string {
     {
       eyebrow: "Public contribution record",
       title: "Contributions",
-      lede: "Compute hours, signed receipts and what you offered. From Run 0 on, accepted work is credited by GitHub handle in the public ledger.",
+      lede: "Compute time from your nodes, the runs they joined and what you offered. Signed receipts and the public ledger by GitHub handle are planned.",
       actions: `${secondary(`https://github.com/${encodeURIComponent(d.v.login)}`, "Your GitHub")}${primary("/console/profile", "Edit what you offer", "w-gear")}`,
     },
     `${kpis([
-      { label: "Compute contributed", value: "0 h", note: "Lifetime GPU-equivalent" },
-      { label: "Accepted updates", value: "0", note: "Across 0 runs" },
+      { label: "Compute contributed", value: duration(totalSeconds(d.swarm)), note: "Training time on your nodes" },
+      { label: "Updates pushed", value: String(totalRounds(d.swarm)), note: `Across ${d.swarm.runs.length} ${d.swarm.runs.length === 1 ? "run" : "runs"}` },
       { label: "Signed receipts", value: "0", note: "Shareable evidence" },
       { label: "You offered", value: String(offered.length), note: offered.length ? offered.slice(0, 3).join(" · ") : "Nothing chosen yet", href: "/console/profile" },
     ])}
 <div class="ws-grid ws-grid-main">
-${panel("Compute contribution history", '<span class="ws-tag">Last 30 days</span>', `<p class="ws-big"><b>0</b> GPU·h</p>${dailyChart(zeros(), d.now, "GPU hours", NO_COMPUTE)}`)}
+${panel("Compute contribution history", '<span class="ws-tag">Last 30 days</span>', `<p class="ws-big"><b>${duration(totalSeconds(d.swarm))}</b> node time</p>${dailyChart(minutes(d), d.now, "Node minutes", NO_COMPUTE)}`)}
 ${panel(
   "Declared hardware",
   '<span class="ws-tag">At sign-up</span>',
@@ -273,6 +282,7 @@ ${panel(
 <dl class="ws-dl"><dt>Public record</dt><dd>From Run 0</dd><dt>Evidence</dt><dd>Signed receipts, planned</dd></dl>`,
 )}
 </div>
+${panel("Runs you contributed to", '<span class="ws-tag">Swarm proof of concept</span>', swarmRuns(d))}
 ${panel(
   "Signed compute receipts",
   '<span class="ws-tag">0 receipts</span>',
