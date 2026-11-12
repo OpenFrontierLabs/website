@@ -7,7 +7,7 @@ Frontend: static HTML + Tailwind v4 (no framework: single static page; hydrogen/
 - Stats: the build reads the GitHub contributor count and fails if GitHub refuses (no made-up 0); set `GITHUB_TOKEN` in the environment (never argv) when the anonymous rate limit bites.
 - Motion: CSS only (no scripts under the CSP), all inside `prefers-reduced-motion: no-preference`; scroll-driven effects sit behind `@supports (animation-timeline: view())`. Keyframe names must not clash with Tailwind's (`spin`, `ping`, `pulse`, `bounce`).
 - Art: official brand PNGs live in `brand/` (source of truth; no redrawn logos). `bun run assets` (sharp) regenerates `art/` (AVIF/WebP/PNG, content-hashed by the build, referenced as `%ART:file%`) and the icons/OG in `public/`.
-- Deploy target: Cloudflare Workers Static Assets, assets-only (`wrangler.toml`). Deploy: `make release` (build, then `wrangler deploy`), run on a fleet host through `heavy-build-route`.
+- Deploy target: Cloudflare Workers Static Assets, assets-only (`wrangler.toml`). Deploy: `make release` (build, then `wrangler deploy` with a one-hour token minted by the ms-01 broker, fudopro `tools/cf-token-broker`, venture `ofl`), run on a fleet host through `heavy-build-route --release`. No Cloudflare credential lives on any host.
 - Check: `make check` (typecheck, oxlint, build, `bun test tests/site.test.ts`). Always name the test file.
 
 ## Rules

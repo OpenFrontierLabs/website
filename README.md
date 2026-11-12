@@ -6,7 +6,7 @@ Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open i
 make setup    # bun install
 make dev      # build and serve dist on a kernel-assigned port
 make check    # typecheck, lint, build, tests
-make release  # build, then wrangler deploy
+make release  # build, then wrangler deploy with a broker-minted token
 ```
 
 Brand tokens (`src/styles.css`): Frontier Green `#66E36E`, Compute Green `#1B7F46`, Graphite `#0B0E0D`, Silver Gray `#6B7177` (decor only; body text uses the lighter `#A1A8AD` for AA contrast), Soft White `#F5F7F6`. Font: Inter variable, self-hosted.
