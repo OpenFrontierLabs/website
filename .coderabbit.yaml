@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://www.coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: >-
+  Plain and direct. Flag real bugs, CSP breaks and unbacked claims about results, traction or users.
+  No praise, no emoji.
+early_access: false
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  commit_status: true
+  collapse_walkthrough: true
+  poem: false
+  in_progress_fortune: false
+  auto_apply_labels: false
+  auto_assign_reviewers: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+  path_filters:
+    - "!bun.lock"
+    - "!art/**"
+    - "!brand/**"
+    - "!**/*.{png,jpg,jpeg,gif,webp,avif,svg,woff2}"
+    - "!worker/assets.gen.ts"
+    - "!src/partials/world-dots.html"
+  path_instructions:
+    - path: "worker/**/*.ts"
+      instructions: >-
+        Server-rendered HTML with no client JS. No redirects between our pages, no KV, R2, queues or
+        Durable Objects, no crons. POSTs must check our Origin; pages set their own strict CSP.
+    - path: "src/**/*.html"
+      instructions: >-
+        Strict CSP: no inline scripts, no `style` attributes, no third-party scripts; use classes.
+        Anything not built is labelled "planned". No claims about results, users or funding.
+    - path: "content/manifesto.md"
+      instructions: >-
+        Must stay word for word the same as MANIFESTO.md in OpenFrontierLabs/openfrontier.
+    - path: "openapi.yaml"
+      instructions: >-
+        Every route in worker/ has an entry here, and paths are versioned.

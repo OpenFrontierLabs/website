@@ -1,5 +1,7 @@
 # Open Frontier Labs website
 
+[![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=OpenFrontierLabs_website&metric=alert_status)](https://sonarcloud.io/project/overview?id=OpenFrontierLabs_website)
+
 Single-page site for [Open Frontier Labs](https://openfrontier-labs.com): open infrastructure for collective frontier intelligence. Static HTML + Tailwind CSS v4 on Cloudflare Workers Static Assets, plus a small Worker (`worker/`) and a D1 database (`ofl-waitlist`, schema in `migrations/`) for GitHub sign-up, the waitlist questionnaire, the contributor workspace (`/console`) and the Operator Console (`/admin`). `/contributors` is built from GitHub at build time: commit authors, the compute ledger and `CREDITS.md`.
 
 ```
