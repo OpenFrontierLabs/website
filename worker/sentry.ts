@@ -12,9 +12,18 @@ const SENSITIVE_KEY =
   /email|cookie|auth|token|secret|password|passwd|pwd|jwt|bearer|session|sid|body|ip_address|client_ip|remote_addr/i;
 const SENSITIVE_SPAN_ATTR =
   /^(client\.address|network\.peer\.address|url\.query|user\.email|user\.id|http\.request\.header\.(authorization|cookie|set-cookie|cf-connecting-ip|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via))$/i;
-const EMAIL_RE = /[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}/gi;
+const EMAIL_TOKEN_RE = /([A-Za-z0-9._%+-]{1,64})@([A-Za-z0-9.-]{1,253})/g;
 
-const scrubEmails = (s: string): string => s.replace(EMAIL_RE, "[email]");
+function scrubEmails(s: string): string {
+  if (!s.includes("@")) return s;
+  return s.replaceAll(EMAIL_TOKEN_RE, (match, _local: string, domain: string) => {
+    const cleanDomain = domain.replace(/\.+$/, "");
+    const dot = cleanDomain.lastIndexOf(".");
+    if (dot <= 0 || dot > cleanDomain.length - 3) return match;
+    const trailingDots = domain.slice(cleanDomain.length);
+    return `[email]${trailingDots}`;
+  });
+}
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
