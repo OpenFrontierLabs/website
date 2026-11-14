@@ -181,6 +181,12 @@ paths:
       summary: Clear the session
       responses:
         "200": { description: HTML page, content: { text/html: {} } }
+  /__sentry-test:
+    get:
+      summary: Inert Sentry error probe; returns normal 404 unless x-sentry-test header matches SENTRY_TEST_KEY
+      responses:
+        "404": { description: Normal 404 page when x-sentry-test header is absent or wrong, content: { text/html: {} } }
+        "500": { description: Throws Error("ofl sentry test") captured by Sentry when authorized }
 components:
   securitySchemes:
     swarmIngest: { type: http, scheme: bearer, description: "Worker secret SWARM_INGEST_TOKEN" }

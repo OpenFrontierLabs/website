@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/cloudflare";
 // Worker for openfrontier-labs.com: static assets plus GitHub sign-up, the waitlist questionnaire,
 // the signed-in workspace (/console) and the Operator Console (/admin). Everything else is assets.
 import * as db from "./db";
@@ -12,6 +13,7 @@ import * as pages from "./workspace-pages";
 import type { WorkspaceData } from "./workspace";
 import { validateAnswers, type Answers } from "./questionnaire";
 import { cookies, randomToken, readSession, sign, SESSION_TTL, setCookie, signSession, STATE_TTL, stateMatches } from "./signing";
+import { secretMatches, sentryOptions } from "./sentry";
 
 interface Env {
   ASSETS: Fetcher;
@@ -24,6 +26,12 @@ interface Env {
   ADMIN_GITHUB_LOGINS: string;
   /** Bearer token of the swarm coordinator. Unset until `wrangler secret put SWARM_INGEST_TOKEN`; ingest then fails closed with 503. */
   SWARM_INGEST_TOKEN?: string;
+  /** Sentry DSN (`wrangler secret put SENTRY_DSN`); unset disables Sentry reporting. */
+  SENTRY_DSN?: string;
+  /** Git short SHA injected at deploy via `--var SENTRY_RELEASE:<sha>`. */
+  SENTRY_RELEASE?: string;
+  /** Header secret for the hidden `/__sentry-test` probe (`wrangler secret put SENTRY_TEST_KEY`). */
+  SENTRY_TEST_KEY?: string;
 }
 
 const SESSION = "__Host-ofl_session";
@@ -83,13 +91,8 @@ async function home(c: Ctx, ctx: ExecutionContext): Promise<Response> {
 const json = (body: unknown, status = 200, cache = "no-store") =>
   new Response(JSON.stringify(body), { status, headers: { ...SECURITY_HEADERS, "content-type": "application/json; charset=utf-8", "cache-control": cache } });
 
-/** Constant-time bearer check: both sides are hashed first so the comparison never depends on length. */
-async function bearerMatches(header: string | null, secret: string): Promise<boolean> {
-  const digest = async (v: string) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(v));
-  const given = header?.startsWith("Bearer ") ? header.slice(7) : "";
-  return crypto.subtle.timingSafeEqual(await digest(given), await digest(secret));
-}
-
+const bearerMatches = (header: string | null, secret: string) =>
+  secretMatches(header?.startsWith("Bearer ") ? header.slice(7) : "", secret);
 async function swarmIngest(c: Ctx): Promise<Response> {
   if (!c.env.SWARM_INGEST_TOKEN) return json({ error: "swarm ingest is not configured" }, 503);
   if (!(await bearerMatches(c.req.headers.get("authorization"), c.env.SWARM_INGEST_TOKEN))) return json({ error: "unauthorized" }, 401);
@@ -243,6 +246,12 @@ const sameOrigin = (req: Request, url: URL) => {
 
 async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   const { pathname } = c.url;
+  if (pathname === "/__sentry-test") {
+    const key = c.env.SENTRY_TEST_KEY ?? "";
+    const given = c.req.headers.get("x-sentry-test") ?? "";
+    if (key.length > 0 && given.length > 0 && (await secretMatches(given, key))) throw new Error("ofl sentry test");
+    return c.env.ASSETS.fetch(c.req);
+  }
   if (pathname === "/v1/swarm/ingest") return c.req.method === "POST" ? swarmIngest(c) : text("Method not allowed", 405);
   if (pathname === "/v1/swarm") return c.req.method === "GET" ? json(await swarm.summary(c.env.DB), 200, "public, max-age=5") : text("Method not allowed", 405);
   if (pathname === "/dashboard") return dashboard(c);
@@ -260,11 +269,13 @@ async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   return operatorRoutes(c, c.user);
 }
 
-export default {
+const handler: ExportedHandler<Env> = {
   async fetch(req, env, ctx): Promise<Response> {
     const url = new URL(req.url);
     const session = await readSession(cookies(req.headers.get("cookie")).get(SESSION), env.SESSION_SECRET);
     const user = session ? await db.getUser(env.DB, session.uid) : null;
     return route({ env, req, url, user }, ctx);
   },
-} satisfies ExportedHandler<Env>;
+};
+
+export default Sentry.withSentry((env: Env) => sentryOptions(env), handler);
