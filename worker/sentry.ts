@@ -7,11 +7,11 @@ export interface SentryEnv {
 }
 
 const SENSITIVE_HEADER =
-  /^(authorization|cookie|set-cookie|cf-connecting-ip|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via|referer|x-api-key|proxy-authorization)$/i;
+  /^(authorization|cookie|set-cookie|cf-connecting-ip|cf-connecting-ipv6|cf-pseudo-ipv4|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via|referer|x-api-key|proxy-authorization)$/i;
 const SENSITIVE_KEY =
   /email|cookie|auth|token|secret|password|passwd|pwd|jwt|bearer|session|sid|body|ip_address|client_ip|remote_addr/i;
 const SENSITIVE_SPAN_ATTR =
-  /^(client\.address|network\.peer\.address|url\.query|user\.email|user\.id|http\.request\.header\.(authorization|cookie|set-cookie|cf-connecting-ip|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via|referer))$/i;
+  /^(client\.address|network\.peer\.address|url\.query|user\.email|user\.id|http\.request\.header\.(authorization|cookie|set-cookie|cf-connecting-ip|cf-connecting-ipv6|cf-pseudo-ipv4|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via|referer))$/i;
 const EMAIL_TOKEN_RE = /([A-Za-z0-9._%+-]{1,64})@([A-Za-z0-9.-]{1,253})/g;
 
 function scrubEmails(s: string): string {
@@ -142,6 +142,8 @@ export function sentryOptions(env: SentryEnv): Sentry.CloudflareOptions {
             "cookie",
             "set-cookie",
             "cf-connecting-ip",
+            "cf-connecting-ipv6",
+            "cf-pseudo-ipv4",
             "true-client-ip",
             "x-forwarded-for",
             "x-real-ip",

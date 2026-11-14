@@ -82,6 +82,8 @@ describe("PII scrubbing", () => {
           authorization: "Bearer secret-token",
           cookie: "__Host-ofl_session=secret-session-value",
           "cf-connecting-ip": "203.0.113.5",
+          "cf-connecting-ipv6": "2001:db8::1",
+          "cf-pseudo-ipv4": "240.0.0.1",
           "x-forwarded-for": "203.0.113.5",
           "x-real-ip": "203.0.113.5",
           "x-sentry-test": "secret-test-key",
@@ -139,6 +141,8 @@ describe("PII scrubbing", () => {
       attributes: {
         "http.request.method": "GET",
         "client.address": "203.0.113.5",
+        "http.request.header.cf-connecting-ipv6": ["2001:db8::1"],
+        "http.request.header.cf-pseudo-ipv4": ["240.0.0.1"],
         "http.request.header.authorization": ["Bearer tok"],
         "http.request.header.cookie": ["sid=1"],
         "http.request.header.referer": ["https://openfrontier-labs.com/admin/review?q=alice%40example.com"],
