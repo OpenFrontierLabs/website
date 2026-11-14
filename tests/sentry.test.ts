@@ -85,6 +85,7 @@ describe("PII scrubbing", () => {
           "x-forwarded-for": "203.0.113.5",
           "x-real-ip": "203.0.113.5",
           "x-sentry-test": "secret-test-key",
+          referer: "https://openfrontier-labs.com/admin/review?q=alice%40example.com",
           "content-type": "application/x-www-form-urlencoded",
           "user-agent": "test-agent",
         },
@@ -140,6 +141,8 @@ describe("PII scrubbing", () => {
         "client.address": "203.0.113.5",
         "http.request.header.authorization": ["Bearer tok"],
         "http.request.header.cookie": ["sid=1"],
+        "http.request.header.referer": ["https://openfrontier-labs.com/admin/review?q=alice%40example.com"],
+        "http.request.header.user-agent": ["crawler alice@example.com"],
         "url.query": "?code=abc",
         "custom.note": "user@example.com",
       },
@@ -147,6 +150,7 @@ describe("PII scrubbing", () => {
     const span = scrubSpan(input);
     expect(span.attributes).toEqual({
       "http.request.method": "GET",
+      "http.request.header.user-agent": ["crawler [email]"],
       "custom.note": "[email]",
     });
   });
@@ -193,5 +197,18 @@ describe("/__sentry-test route", () => {
     }
     expect(caught).toBeInstanceOf(Error);
     if (caught instanceof Error) expect(caught.message).toBe("ofl sentry test");
+  });
+
+  test("does not trigger probe on non-GET requests", async () => {
+    const worker = await loadWorker();
+    const res = await worker.fetch(
+      new Request("https://openfrontier-labs.com/__sentry-test", {
+        method: "POST",
+        headers: { "x-sentry-test": "expected-key", "sec-fetch-site": "same-origin" },
+      }),
+      makeEnv("expected-key"),
+      noopCtx,
+    );
+    expect(res.status).toBe(404);
   });
 });

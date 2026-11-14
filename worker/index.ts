@@ -246,16 +246,18 @@ const sameOrigin = (req: Request, url: URL) => {
 
 async function route(c: Ctx, ctx: ExecutionContext): Promise<Response> {
   const { pathname } = c.url;
-  if (pathname === "/__sentry-test") {
-    const key = c.env.SENTRY_TEST_KEY ?? "";
-    const given = c.req.headers.get("x-sentry-test") ?? "";
-    if (key.length > 0 && given.length > 0 && (await secretMatches(given, key))) throw new Error("ofl sentry test");
-    return c.env.ASSETS.fetch(c.req);
-  }
   if (pathname === "/v1/swarm/ingest") return c.req.method === "POST" ? swarmIngest(c) : text("Method not allowed", 405);
   if (pathname === "/v1/swarm") return c.req.method === "GET" ? json(await swarm.summary(c.env.DB), 200, "public, max-age=5") : text("Method not allowed", 405);
   if (pathname === "/dashboard") return dashboard(c);
   if (c.req.method === "POST" && !sameOrigin(c.req, c.url)) return text("Cross-origin request refused", 403);
+  if (pathname === "/__sentry-test") {
+    const key = c.env.SENTRY_TEST_KEY ?? "";
+    const given = c.req.headers.get("x-sentry-test") ?? "";
+    if (c.req.method === "GET" && key.length > 0 && given.length > 0 && (await secretMatches(given, key))) {
+      throw new Error("ofl sentry test");
+    }
+    return c.env.ASSETS.fetch(c.req);
+  }
   if (pathname === "/") return home(c, ctx);
   if (pathname === "/auth/github") return startOAuth(c);
   if (pathname === "/auth/github/callback") return finishOAuth(c);
