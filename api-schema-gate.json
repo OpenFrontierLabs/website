@@ -21,7 +21,8 @@
     "/join/questionnaire",
     "/console/profile",
     "/admin/review/{id}/status",
-    "/logout"
+    "/logout",
+    "/__sentry-test"
   ],
   "reason": "Server-rendered browser pages and the OAuth callback URL registered with GitHub; no programmatic API, so no /v1 segment."
 }
