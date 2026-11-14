@@ -12,7 +12,7 @@ const SENSITIVE_KEY =
   /email|cookie|auth|token|secret|password|passwd|pwd|jwt|bearer|session|sid|body|ip_address|client_ip|remote_addr/i;
 const SENSITIVE_SPAN_ATTR =
   /^(client\.address|network\.peer\.address|url\.query|user\.email|user\.id|http\.request\.header\.(authorization|cookie|set-cookie|cf-connecting-ip|true-client-ip|x-forwarded-for|x-real-ip|x-client-ip|x-sentry-test|forwarded|via))$/i;
-const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const EMAIL_RE = /[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}/gi;
 
 const scrubEmails = (s: string): string => s.replace(EMAIL_RE, "[email]");
 
