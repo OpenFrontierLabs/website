@@ -17,7 +17,9 @@ const EMAIL_TOKEN_RE = /([A-Za-z0-9._%+-]{1,64})@([A-Za-z0-9.-]{1,253})/g;
 function scrubEmails(s: string): string {
   if (!s.includes("@")) return s;
   return s.replaceAll(EMAIL_TOKEN_RE, (match, _local: string, domain: string) => {
-    const cleanDomain = domain.replace(/\.+$/, "");
+    let end = domain.length;
+    while (end > 0 && domain[end - 1] === ".") end -= 1;
+    const cleanDomain = domain.slice(0, end);
     const dot = cleanDomain.lastIndexOf(".");
     if (dot <= 0 || dot > cleanDomain.length - 3) return match;
     const trailingDots = domain.slice(cleanDomain.length);
