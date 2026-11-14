@@ -185,7 +185,7 @@ paths:
     get:
       summary: Inert Sentry error probe; returns normal 404 unless GET x-sentry-test header matches SENTRY_TEST_KEY
       responses:
-        "404": { description: Normal 404 page when x-sentry-test header is absent or wrong, content: { text/html: {} } }
+        "404": { description: Normal 404 page when SENTRY_TEST_KEY is unset or x-sentry-test header is absent or wrong, content: { text/html: {} } }
         "500": { description: Throws Error("ofl sentry test") captured by Sentry when authorized }
 components:
   securitySchemes:
