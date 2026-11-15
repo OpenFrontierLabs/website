@@ -36,6 +36,13 @@ describe("renderCompute", () => {
     ]);
   });
 
+  test("the spelling shown for a handle does not depend on the order the files arrive in", () => {
+    const early = file("run0-2027-01.json", { nodes: [node("Alice", 1)] });
+    const late = file("run0-2027-02.json", { nodes: [node("alice", 1)] });
+    expect(handlesIn(renderCompute([early, late]))).toEqual([["Alice", "Alice", "2"]]);
+    expect(handlesIn(renderCompute([late, early]))).toEqual([["Alice", "Alice", "2"]]);
+  });
+
   test("example files never render: not by name, not by flag, not with real-looking handles", () => {
     const nodes = [node("example-handle-one", 168), node("realperson", 24.5)];
     const byName = file("example.EXAMPLE.json", { nodes, islands: [{ id: "i", name: "Example Island", donor: "Example Donor" }] });

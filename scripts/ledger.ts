@@ -22,7 +22,8 @@ const LEDGER_URL = "https://github.com/OpenFrontierLabs/openfrontier/tree/main/l
  * carries can reach the page. GitHub handles are case-insensitive, so one person is one row.
  */
 export function renderCompute(files: LedgerFile[]): string {
-  const real = files.filter((f) => !f.name.includes("EXAMPLE") && f.data.example !== true);
+  // Sorted by path so the spelling shown for a handle under two spellings does not depend on the order files arrive in.
+  const real = files.filter((f) => !f.name.includes("EXAMPLE") && f.data.example !== true).sort((x, y) => (x.path < y.path ? -1 : x.path > y.path ? 1 : 0));
   const donors = new Map<string, { handle: string; gpuHours: number; runs: Set<string> }>();
   const islands = new Map<string, string>();
   for (const { path, data } of real) {
