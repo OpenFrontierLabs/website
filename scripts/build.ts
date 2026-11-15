@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { escapeHtml } from "./html";
+import { type LedgerFile, renderCompute } from "./ledger";
 
 const root = join(import.meta.dir, "..");
 const dist = join(root, "dist");
@@ -54,17 +56,6 @@ interface Person {
   login: string;
   commits: number;
   avatar: { type: string; base64: string };
-}
-/** One compute ledger file (ledger/*.json in openfrontier, schema.json aside), examples included: they are dropped below. */
-interface LedgerFile {
-  path: string;
-  name: string;
-  data: {
-    example?: boolean;
-    run: string;
-    islands?: { id: string; name: string; donor: string }[];
-    nodes: { github_handle: string; gpu_hours: number }[];
-  };
 }
 interface GitHubData {
   contributors: number;
@@ -125,7 +116,6 @@ const fixture = process.env.OFL_GITHUB_FIXTURE;
 const gh: GitHubData = fixture ? JSON.parse(await readFile(fixture, "utf8")) : await fromGitHub();
 
 // Recent activity: the latest merged pull requests across the organisation's repositories.
-const escapeHtml = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const merged = REPOS.flatMap((repo) => (gh.pulls[repo] ?? []).filter((p) => p.merged_at !== null).map((p) => ({ ...p, repo, mergedAt: p.merged_at! })))
   .sort((a, b) => b.mergedAt.localeCompare(a.mergedAt))
   .slice(0, 6);
@@ -157,30 +147,6 @@ const contributorsList = (
   )
 ).join("\n");
 
-// Compute ledger: real files only. Examples (EXAMPLE in the name, "example": true inside) are never rendered.
-const HANDLE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
-const ledgers = gh.ledger.filter((f) => !f.name.includes("EXAMPLE") && f.data.example !== true);
-const donors = new Map<string, { gpuHours: number; runs: Set<string> }>();
-const islands = new Map<string, string>();
-for (const { path, data } of ledgers) {
-  for (const node of data.nodes) {
-    if (!HANDLE.test(node.github_handle) || !Number.isFinite(node.gpu_hours) || node.gpu_hours < 0) throw new Error(`${path}: invalid node ${JSON.stringify(node)}`);
-    const donor = donors.get(node.github_handle) ?? { gpuHours: 0, runs: new Set<string>() };
-    donor.gpuHours += node.gpu_hours;
-    donor.runs.add(data.run);
-    donors.set(node.github_handle, donor);
-  }
-  for (const island of data.islands ?? []) islands.set(`${data.run}/${island.id}`, `<li><b>${escapeHtml(island.name)}</b>, donated by ${escapeHtml(island.donor)} (${escapeHtml(data.run)})</li>`);
-}
-const ledgerUrl = "https://github.com/OpenFrontierLabs/openfrontier/tree/main/ledger";
-const leaderboard =
-  donors.size === 0
-    ? `<div class="gcard people-empty"><span class="tag">Planned</span><p>No compute has been donated yet: nothing has been trained, so the <a href="${ledgerUrl}" rel="noopener">compute ledger</a> holds no real entries. When Run 0 produces its first ledger file, every node's GitHub handle and GPU-hours show here, ranked.</p></div>`
-    : `<div class="app-table-wrap"><table class="app-table"><thead><tr><th>#</th><th>GitHub handle</th><th>GPU-hours</th><th>Runs</th></tr></thead><tbody>${[...donors]
-        .sort(([ha, a], [hb, b]) => b.gpuHours - a.gpuHours || ha.localeCompare(hb))
-        .map(([handle, d], i) => `<tr><td>${i + 1}</td><td><a href="https://github.com/${handle}" rel="noopener">${handle}</a></td><td>${d.gpuHours.toLocaleString("en-US", { maximumFractionDigits: 1 })}</td><td>${escapeHtml([...d.runs].sort().join(", "))}</td></tr>`)
-        .join("")}</tbody></table></div>${islands.size ? `<h3>Donated clusters (islands)</h3><ul class="people-islands">${[...islands.values()].join("")}</ul>` : ""}<p class="muted">From ${ledgers.map((f) => `<a href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/${escapeHtml(f.path)}" rel="noopener">${escapeHtml(f.name)}</a>`).join(", ")}.</p>`;
-
 // CREDITS.md, word for word; its relative links point into the openfrontier repository.
 const credits = Bun.markdown
   .html(gh.credits)
@@ -191,7 +157,7 @@ const stats = {
   "%GH_CONTRIBUTORS%": String(gh.contributors),
   "%ACTIVITY%": activity,
   "%CONTRIBUTORS%": contributorsList,
-  "%LEADERBOARD%": leaderboard,
+  "%LEADERBOARD%": renderCompute(gh.ledger),
   "%CREDITS%": credits,
 };
 
