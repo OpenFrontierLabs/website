@@ -41,7 +41,7 @@ export function renderCompute(files: LedgerFile[]): string {
   }
   const rows = [...donors.values()]
     .sort((a, b) => b.gpuHours - a.gpuHours || a.handle.toLowerCase().localeCompare(b.handle.toLowerCase()))
-    .map((d, i) => `<tr><td>${i + 1}</td><td><a href="https://github.com/${d.handle}" rel="noopener">${d.handle}</a></td><td>${d.gpuHours.toLocaleString("en-US", { maximumFractionDigits: 1 })}</td><td>${escapeHtml([...d.runs].sort().join(", "))}</td></tr>`)
+    .map((d, i) => `<tr><td>${i + 1}</td><td><a href="https://github.com/${d.handle}" rel="noopener">${d.handle}</a></td><td>${d.gpuHours.toLocaleString("en-US", { maximumFractionDigits: 1 })}</td><td>${escapeHtml([...d.runs].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0)).join(", "))}</td></tr>`)
     .join("");
   const clusters = islands.size ? `<h3>Donated clusters (islands)</h3><ul class="people-islands">${[...islands.values()].join("")}</ul>` : "";
   const sources = real.map((f) => `<a href="https://github.com/OpenFrontierLabs/openfrontier/blob/main/${escapeHtml(f.path)}" rel="noopener">${escapeHtml(f.name)}</a>`).join(", ");
